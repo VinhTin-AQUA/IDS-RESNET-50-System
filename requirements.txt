@@ -1,0 +1,11 @@
+# pip install -r requirements.txt: cai dat
+# pip freeze > requirements.txt: liet ke goi
+
+scipy
+matplotlib
+numpy
+pandas
+astropy
+scikit-learn
+pyarrow
+tensorflow
