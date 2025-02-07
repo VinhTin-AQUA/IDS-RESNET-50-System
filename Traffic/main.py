@@ -1,15 +1,11 @@
 import argparse
-
 from scapy.sendrecv import AsyncSniffer
-
 from packages.flow_session import generate_session_class
-
 import threading, time
 
 def create_sniffer(
     input_file, input_interface, output_mode, output_file
 ):
-    print(input_file)
     assert (input_file is None) ^ (input_interface is None)
     
     NewFlowSession = generate_session_class(output_mode, output_file)
@@ -17,16 +13,16 @@ def create_sniffer(
     if input_file is not None:
         return AsyncSniffer(
             offline=input_file,
-            filter="ip and tcp",
-            prn=None,
+            filter="ip and udp",
+            prn=lambda x: NewFlowSession.on_convert_pcap_to_csv(NewFlowSession,packet=x),
             session=NewFlowSession,
             store=False,
         )
     else:
         return AsyncSniffer(
             iface=input_interface,
-            filter="ip and tcp",
-            prn=None,
+            filter="ip and udp",
+            prn=lambda x: NewFlowSession.on_packet_received(NewFlowSession,packet=x),
             session=NewFlowSession,
             store=False,
         )
@@ -152,26 +148,40 @@ def main2():
         finally:
             sniffer.join()
 
-# ============================================
+# ============ conver pcap to csv ===============
 
-def handle_packet(packet):
-    print(packet['IP'].src)
-
-def main3():
-    output_mode= 'flow'
-    output_file= 'flow.csv'
-    input_interface = 'Wi-Fi'
-
-    NewFlowSession = generate_session_class(output_mode, output_file)
-
-    sniffer =AsyncSniffer(
-            iface=input_interface,
-            filter="ip and tcp",
-            prn=handle_packet,
-            session=NewFlowSession,
-            store=False,
-        )
+def convert_pcap_to_csv():
     
+    # convert udp flow
+    # output = 'csv/udp_flows.csv'
+    # input_file= 'pcaps/udp_flows.pcap'
+
+    # convert tcp flow
+    output = 'csv/tcp_flows.csv'
+    input_file= 'pcaps/tcp_flows.pcap'
+
+    # input_interface = 'Wi-Fi'
+    input_interface = None
+    output_mode = 'flow'
+    limit= 600 # 600 seconds lay packet trong vong 600 giay
+
+    assert (input_file is None) ^ (input_interface is None)
+
+    NewFlowSession = generate_session_class(output_mode, output)
+    sniffer = None
+
+    sniffer = AsyncSniffer(
+        offline=input_file,
+        filter="ip and tcp",
+        prn=lambda x: NewFlowSession.on_packet_received_custom(NewFlowSession,packet=x),
+        session=NewFlowSession,
+        store=False,
+    )
+
+    print("\033[32mIn flow mode\033[0m")
+    print("Start to generate csv file!")
+    print("----------------------------------")
+
     sniffer.start()
     try:
         sniffer.join()
@@ -179,80 +189,68 @@ def main3():
     except KeyboardInterrupt:
         print("\033[31mInterrupted by user!\033[0m")
         x = sniffer.stop()
-        # while sniffer.results is None:
-        #     time.sleep(1)
+        while sniffer.results is None:
+            time.sleep(1)
 
     finally:
         sniffer.join()
+        
+# ============ get packets realtime ===============
 
-# ============================================
-
-def main():
+def get_packet_realtime():
     
-    output = 'flow.csv'
-    input_file= 'flows.pcap'
-    # input_interface = 'Wi-Fi'
-    input_interface = None
-    output_mode = 'flow'
-    limit= 600
+    # convert udp flow
+    output = 'csv/real_time_flows.csv'
+    input_file = None
 
-    sniffer = create_sniffer(
-        input_file,
-        input_interface,
-        output_mode,
-        output,
+    input_interface = 'ens33' # ten interface cua mang
+    output_mode = 'detection'
+    limit= 600 # 600 seconds: lay packet trong vong 600 giay
+
+    assert (input_file is None) ^ (input_interface is None)
+
+    NewFlowSession = generate_session_class(output_mode, output)
+    sniffer = None
+
+    sniffer = AsyncSniffer(
+        iface=input_interface,
+        filter="ip and (udp or tcp)",
+        prn=lambda x: NewFlowSession.on_packet_received_custom(NewFlowSession,packet=x),
+        session=NewFlowSession,
+        store=False,
     )
-    #if args.limit > 600 or args.limit < 1:
-    #    raise ValueError("\033[31mthe range of timelimit is (0,600]!\033[0m")
 
-    if output_mode == "flow":
-        print("\033[32mIn flow mode\033[0m")
-        print("Start to generate csv file!")
-        print("----------------------------------")
-    else:
-        print("\033[32mIn predict mode\033[0m")
-        print("Detector started!")
-        print("----------------------------------")
+    print("\033[32mIn predict mode\033[0m")
+    print("----------------------------------")
+        
 
-    if input_file is None:
-        t = threading.Timer(limit, timelimit, (sniffer,))
-        t.start()
-        sniffer.start()
+    t = threading.Timer(limit, timelimit, (sniffer,))
+    t.start()
+    sniffer.start()
 
-        try:
-            sniffer.join()
-            if t.is_alive():
-                t.cancel()
-                t.join()
-    
-        except KeyboardInterrupt:
-            print("\033[31mInterrupted by user!\033[0m")
+    try:
+        sniffer.join()
+        if t.is_alive():
             t.cancel()
             t.join()
-            x = sniffer.stop()
-            while sniffer.results is None:
-                time.sleep(1)
-    
-        finally:
-            sniffer.join()
-            if t.is_alive():
-                t.cancel()
-                t.join()
 
-    elif input_file is not None:
-        sniffer.start()
+    except KeyboardInterrupt:
+        print("\033[31mInterrupted by user!\033[0m")
+        t.cancel()
+        t.join()
+        x = sniffer.stop()
+        while sniffer.results is None:
+            time.sleep(1)
 
-        try:
-            sniffer.join()
+    finally:
+        sniffer.join()
+        if t.is_alive():
+            t.cancel()
+            t.join()
 
-        except KeyboardInterrupt:
-            print("\033[31mInterrupted by user!\033[0m")
-            x = sniffer.stop()
-            while sniffer.results is None:
-                time.sleep(1)
 
-        finally:
-            sniffer.join()
+
 
 if __name__ == "__main__":
-    main()
+    # convert_pcap_to_csv()
+    get_packet_realtime()

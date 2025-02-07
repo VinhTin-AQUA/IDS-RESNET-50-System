@@ -16,6 +16,8 @@ import threading
 import time
 from datetime import datetime
 
+import csv
+
 GARBAGE_COLLECT_PACKETS = 10000
 
 
@@ -54,6 +56,7 @@ class FlowSession(DefaultSession):
 
 
     def on_packet_received(self, packet):
+        
         count = 0
         direction = PacketDirection.FORWARD
         proto = None
@@ -66,7 +69,7 @@ class FlowSession(DefaultSession):
             # Creates a key variable to check
             packet_flow_key = get_packet_flow_key(packet, direction)
             flow = self.flows.get(packet_flow_key)
-        except Exception:
+        except Exception as e:
             return
 
         self.packets_count += 1
@@ -77,20 +80,22 @@ class FlowSession(DefaultSession):
             direction = PacketDirection.REVERSE
             packet_flow_key = get_packet_flow_key(packet, direction)
             flow = self.flows.get(packet_flow_key)
-
+            
             if flow is None:
                 # If no flow exists create a new flow
                 direction = PacketDirection.FORWARD
                 flow = Flow(packet, direction)
                 packet_flow_key = get_packet_flow_key(packet, direction)
                 self.flows[packet_flow_key] = flow
-            
+
+        print(packet["TCP"].flags)
+
         if proto == "TCP" and ("F" in str(packet["TCP"].flags)):
             if direction == PacketDirection.FORWARD:
                 flow.fwd_fin += 1
             elif direction == PacketDirection.REVERSE:
                 flow.bwd_fin += 1
-
+        
         if (packet.time - flow.start_timestamp) > constants.FLOW_TIMEOUT and len(flow.packets) > 0:
             self.garbage_collect(packet.time, packet_flow_key, packet)
             
@@ -115,10 +120,32 @@ class FlowSession(DefaultSession):
         del packet
         #print(self.packets_count)
 
+    def on_packet_received_custom(self, packet):
+        direction = PacketDirection.FORWARD
+        flow = Flow(packet, direction)
+        flow.add_packet(packet, direction)
+
+        data = flow.get_data()  # Lấy dữ liệu từ flow
+
+        # Kiểm tra xem file có tồn tại và có dữ liệu hay không
+        file_exists = os.path.exists(self.output_file) and os.stat(self.output_file).st_size > 0
+
+        # Mở file ở chế độ 'a' để ghi tiếp vào cuối file
+        with open(self.output_file, 'a', newline='') as file:
+            writer = csv.writer(file)
+
+            # Nếu file mới hoặc rỗng, ghi header
+            if not file_exists:
+                writer.writerow(data.keys())  
+
+            # Ghi dữ liệu mới vào file
+            writer.writerow(data.values())
+
     def get_flows(self) -> list:
         return self.flows.values()
 
     def garbage_collect(self, latest_time, flow_key = None, pkt = None) -> None:
+        print(213)
         # TODO: Garbage Collection / Feature Extraction should have a separate thread
 
         flow = self.flows.get(flow_key)
@@ -454,6 +481,7 @@ class FlowSession(DefaultSession):
                                 del self.flows[k]
                                 del perflow
 
+    
 
 def generate_session_class(output_mode, output_file):
     return type(

@@ -11,6 +11,8 @@
 # pip install --upgrade pip
 # pip install -r requirements.txt
 
+# sudo $(which python3) main.py
+
 
 scipy
 scapy
