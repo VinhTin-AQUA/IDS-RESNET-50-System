@@ -1,7 +1,8 @@
 import argparse
 from scapy.sendrecv import AsyncSniffer
-from packages.flow_session import generate_session_class
+from packages.flow_realtime.flow_session import generate_session_class
 import threading, time
+from packages.kafka_service.consumer import KafkaConsumer
 
 def create_sniffer(
     input_file, input_interface, output_mode, output_file
@@ -248,9 +249,19 @@ def get_packet_realtime():
             t.cancel()
             t.join()
 
-
-
+def handle_packet_in_kafka():
+    consumer = KafkaConsumer()
+    consumer.consume_messages()  # Vòng lặp này chạy liên tục để nhận dữ liệu Kafka
 
 if __name__ == "__main__":
     # convert_pcap_to_csv()
+
+    consumer_thread = threading.Thread(target=handle_packet_in_kafka, daemon=True) # chay trong luong rieng biet
+    consumer_thread.start()
+    
     get_packet_realtime()
+    
+
+    
+
+

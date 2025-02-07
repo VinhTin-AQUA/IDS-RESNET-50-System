@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-from .packet_direction import PacketDirection
+from packages.flow_realtime.packet_direction import PacketDirection
 
 
 def get_packet_flow_key(packet, direction) -> tuple:

@@ -1,7 +1,7 @@
 from scapy.layers.inet import IP, TCP
 
-from .context.packet_direction import PacketDirection
-from .packet_time import PacketTime
+from packages.flow_realtime.packet_direction import PacketDirection
+from packages.flow_realtime.packet_time import PacketTime
 import numpy
 
 class FlowBytes:

@@ -1,4 +1,4 @@
-from .context.packet_direction import PacketDirection
+from packages.flow_realtime.packet_direction import PacketDirection
 
 class FlagCount:
     """This class extracts features related to the Flags Count."""

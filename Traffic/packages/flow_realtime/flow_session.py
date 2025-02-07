@@ -4,10 +4,10 @@ from collections import defaultdict
 import requests
 from scapy.sessions import DefaultSession
 
-from . import constants
-from features.context.packet_direction import PacketDirection
-from features.context.packet_flow_key import get_packet_flow_key
-from .flow import Flow
+from packages.flow_realtime import constants
+from packages.flow_realtime.packet_direction import PacketDirection
+from packages.flow_realtime.packet_flow_key import get_packet_flow_key
+from packages.flow_realtime.flow import Flow
 from pandas.core.frame import DataFrame
 import os
 import pickle
@@ -15,8 +15,9 @@ import sys
 import threading
 import time
 from datetime import datetime
-
 import csv
+from packages.kafka_service.producer import KafkaProducer
+import json
 
 GARBAGE_COLLECT_PACKETS = 10000
 
@@ -25,6 +26,7 @@ class FlowSession(DefaultSession):
     """Creates a list of network flows."""
 
     def __init__(self, *args, **kwargs):
+        
         self.flows = {}
         self.csv_line = 0
         self.ip_list = {}
@@ -36,7 +38,7 @@ class FlowSession(DefaultSession):
         elif self.output_mode == "predict":
             with open(os.path.abspath(self.output_file), "rb") as f:
                 self.model = pickle.load(f)
-
+        
         self.packets_count = 0
         self.clumped_flows_per_label = defaultdict(list)
         super(FlowSession, self).__init__(*args, **kwargs)
@@ -124,22 +126,37 @@ class FlowSession(DefaultSession):
         direction = PacketDirection.FORWARD
         flow = Flow(packet, direction)
         flow.add_packet(packet, direction)
-
         data = flow.get_data()  # Lấy dữ liệu từ flow
 
-        # Kiểm tra xem file có tồn tại và có dữ liệu hay không
-        file_exists = os.path.exists(self.output_file) and os.stat(self.output_file).st_size > 0
+    
 
-        # Mở file ở chế độ 'a' để ghi tiếp vào cuối file
-        with open(self.output_file, 'a', newline='') as file:
-            writer = csv.writer(file)
+        ############# du doan #############
+        data_x = DataFrame([data])
+        data_x = data_x[constants.SELECT_FEATURES]
+        # res = self.model.predict(data_x)
+        value_json = json.dumps(data).encode('utf-8')
 
-            # Nếu file mới hoặc rỗng, ghi header
-            if not file_exists:
-                writer.writerow(data.keys())  
+        print(2)
 
-            # Ghi dữ liệu mới vào file
-            writer.writerow(data.values())
+        producer = KafkaProducer()
+        producer.send_message('flow', value_json)
+
+
+        ############# luu file #############
+
+        # # Kiểm tra xem file có tồn tại và có dữ liệu hay không
+        # file_exists = os.path.exists(self.output_file) and os.stat(self.output_file).st_size > 0
+
+        # # Mở file ở chế độ 'a' để ghi tiếp vào cuối file
+        # with open(self.output_file, 'a', newline='') as file:
+        #     writer = csv.writer(file)
+
+        #     # Nếu file mới hoặc rỗng, ghi header
+        #     if not file_exists:
+        #         writer.writerow(data.keys())  
+
+        #     # Ghi dữ liệu mới vào file
+        #     writer.writerow(data.values())
 
     def get_flows(self) -> list:
         return self.flows.values()
