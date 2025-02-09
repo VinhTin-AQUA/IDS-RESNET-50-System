@@ -17,4 +17,3 @@ class KafkaConsumer:
             else:
                 message_dict = json.loads(msg.value().decode('utf-8'))
                 
-
