@@ -258,7 +258,6 @@ if __name__ == "__main__":
 
     consumer_thread = threading.Thread(target=handle_packet_in_kafka, daemon=True) # chay trong luong rieng biet
     consumer_thread.start()
-    
     get_packet_realtime()
     
 

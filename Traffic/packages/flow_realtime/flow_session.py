@@ -136,11 +136,8 @@ class FlowSession(DefaultSession):
         # res = self.model.predict(data_x)
         value_json = json.dumps(data).encode('utf-8')
 
-        print(2)
-
         producer = KafkaProducer()
         producer.send_message('flow', value_json)
-
 
         ############# luu file #############
 
