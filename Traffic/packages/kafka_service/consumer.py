@@ -16,4 +16,5 @@ class KafkaConsumer:
                 print(f'Error: {msg.error()}')
             else:
                 message_dict = json.loads(msg.value().decode('utf-8'))
-                
+
+                # predict

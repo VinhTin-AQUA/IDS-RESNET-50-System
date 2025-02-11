@@ -131,29 +131,29 @@ class FlowSession(DefaultSession):
     
 
         ############# du doan #############
-        data_x = DataFrame([data])
-        data_x = data_x[constants.SELECT_FEATURES]
-        # res = self.model.predict(data_x)
-        value_json = json.dumps(data).encode('utf-8')
+        # data_x = DataFrame([data])
+        # data_x = data_x[constants.SELECT_FEATURES]
+        # # res = self.model.predict(data_x)
+        # value_json = json.dumps(data).encode('utf-8')
 
-        producer = KafkaProducer()
-        producer.send_message('flow', value_json)
+        # producer = KafkaProducer()
+        # producer.send_message('flow', value_json)
 
         ############# luu file #############
 
-        # # Kiểm tra xem file có tồn tại và có dữ liệu hay không
-        # file_exists = os.path.exists(self.output_file) and os.stat(self.output_file).st_size > 0
+        # Kiểm tra xem file có tồn tại và có dữ liệu hay không
+        file_exists = os.path.exists(self.output_file) and os.stat(self.output_file).st_size > 0
 
-        # # Mở file ở chế độ 'a' để ghi tiếp vào cuối file
-        # with open(self.output_file, 'a', newline='') as file:
-        #     writer = csv.writer(file)
+        # Mở file ở chế độ 'a' để ghi tiếp vào cuối file
+        with open(self.output_file, 'a', newline='') as file:
+            writer = csv.writer(file)
 
-        #     # Nếu file mới hoặc rỗng, ghi header
-        #     if not file_exists:
-        #         writer.writerow(data.keys())  
+            # Nếu file mới hoặc rỗng, ghi header
+            if not file_exists:
+                writer.writerow(data.keys())  
 
-        #     # Ghi dữ liệu mới vào file
-        #     writer.writerow(data.values())
+            # Ghi dữ liệu mới vào file
+            writer.writerow(data.values())
 
     def get_flows(self) -> list:
         return self.flows.values()
