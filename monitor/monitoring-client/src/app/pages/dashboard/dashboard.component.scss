@@ -1,0 +1,12 @@
+.chart-container {
+	width: 100vw; /* Chiếm toàn bộ chiều rộng màn hình */
+	height: 100vh; /* Chiếm toàn bộ chiều cao màn hình */
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.chart {
+	width: 100%;
+	height: 100%;
+}
