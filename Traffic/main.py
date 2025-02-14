@@ -154,12 +154,12 @@ def main2():
 def convert_pcap_to_csv():
     
     # convert udp flow
-    # output = 'csv/udp_flows.csv'
-    # input_file= 'pcaps/udp_flows.pcap'
+    output = 'csv/udp_flows.csv'
+    input_file= 'pcaps/udp_flows.pcap'
 
     # convert tcp flow
-    output = 'csv/tcp_flows.csv'
-    input_file= 'pcaps/tcp_flows.pcap'
+    # output = 'csv/tcp_flows.csv'
+    # input_file= 'pcaps/tcp_flows.pcap'
 
     # input_interface = 'Wi-Fi'
     input_interface = None
@@ -173,7 +173,7 @@ def convert_pcap_to_csv():
 
     sniffer = AsyncSniffer(
         offline=input_file,
-        filter="ip and tcp",
+        filter="ip and udp",
         prn=lambda x: NewFlowSession.on_packet_received_custom(NewFlowSession,packet=x),
         session=NewFlowSession,
         store=False,
