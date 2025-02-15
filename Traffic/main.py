@@ -199,55 +199,37 @@ def convert_pcap_to_csv():
 # ============ get packets realtime ===============
 
 def get_packet_realtime():
-    
     # convert udp flow
     output = 'csv/real_time_flows.csv'
     input_file = None
-
-    input_interface = 'ens33' # ten interface cua mang
+    input_interface = 'ens33'  # Tên interface của mạng
     output_mode = 'detection'
-    limit= 600 # 600 seconds: lay packet trong vong 600 giay
 
     assert (input_file is None) ^ (input_interface is None)
 
     NewFlowSession = generate_session_class(output_mode, output)
-    sniffer = None
 
     sniffer = AsyncSniffer(
         iface=input_interface,
         filter="ip and (udp or tcp)",
-        prn=lambda x: NewFlowSession.on_packet_received_custom(NewFlowSession,packet=x),
+        prn=lambda x: NewFlowSession.on_packet_received_custom(NewFlowSession, packet=x),
         session=NewFlowSession,
         store=False,
     )
 
     print("\033[32mIn predict mode\033[0m")
     print("----------------------------------")
-        
 
-    t = threading.Timer(limit, timelimit, (sniffer,))
-    t.start()
     sniffer.start()
 
     try:
-        sniffer.join()
-        if t.is_alive():
-            t.cancel()
-            t.join()
-
+        while True:  # Chạy vô hạn, không giới hạn thời gian
+            time.sleep(1)  # Tránh tiêu tốn CPU quá mức
     except KeyboardInterrupt:
         print("\033[31mInterrupted by user!\033[0m")
-        t.cancel()
-        t.join()
-        x = sniffer.stop()
-        while sniffer.results is None:
-            time.sleep(1)
-
+        sniffer.stop()
     finally:
         sniffer.join()
-        if t.is_alive():
-            t.cancel()
-            t.join()
 
 def handle_packet_in_kafka():
     consumer = KafkaConsumer()
@@ -258,7 +240,12 @@ if __name__ == "__main__":
 
     consumer_thread = threading.Thread(target=handle_packet_in_kafka, daemon=True) # chay trong luong rieng biet
     consumer_thread.start()
-    get_packet_realtime()
+    
+    realtime_thread = threading.Thread(target=get_packet_realtime, daemon=True)
+    realtime_thread.start()
+
+    while True:
+        pass
     
 
     

@@ -1,14 +1,25 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { json, urlencoded } from 'express';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
+
+    app.useGlobalPipes(
+        new ValidationPipe({
+            transform: true, // Đảm bảo việc chuyển đổi kiểu dữ liệu từ string sang Date
+        }),
+    );
+
+    
 	// Cho phép CORS
 	app.enableCors({
-		origin: 'http://localhost:4200', // Chỉ định nguồn được phép
+		origin: '*', // Chỉ định nguồn được phép
 		methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
 		credentials: true, // Cho phép gửi cookie, authorization headers
 	});
+
 	await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

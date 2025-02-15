@@ -1,67 +1,75 @@
-<div class="relative overflow-x-auto">
-	<table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-		<thead
-			class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
-		>
-			<tr>
-				<th scope="col" class="px-6 py-3">src_ip</th>
-				<th scope="col" class="px-6 py-3">dst_ip</th>
-				<th scope="col" class="px-6 py-3">protocol</th>
-				<th scope="col" class="px-6 py-3">timestamp</th>
-				<th></th>
-			</tr>
-		</thead>
-		<tbody>
-			@for (item of flows; track $index) {
-			<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
-				<th
-					scope="row"
-					class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-				>
-					{{ item.src_ip }}
-				</th>
-				<td class="px-6 py-4">
-					{{ item.dst_ip }}
-				</td>
-				<td class="px-6 py-4">
-					{{ item.protocol }}
-				</td>
-				<td class="px-6 py-4">
-					{{ item.timestamp }}
-				</td>
-				<td>
-					<button>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke-width="1.5"
-							stroke="currentColor"
-							class="size-6"
+<div class=" p-4">
+	<div>
+
+        <!-- action -->
+        <div>
+            <button>ADD</button>
+        </div>
+
+        <!-- table -->
+		<div class="relative overflow-x-auto rounded-md shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)]">
+			<table
+				class="w-full text-sm text-left rtl:text-right text-gray-500"
+			>
+				<thead class="text-xs text-gray-700 uppercase bg-gray-50">
+					<tr>
+						<th scope="col" class="px-6 py-3">src_ip</th>
+						<th scope="col" class="px-6 py-3">dst_ip</th>
+						<th scope="col" class="px-6 py-3">src_port</th>
+						<th scope="col" class="px-6 py-3">dst_port</th>
+						<th scope="col" class="px-6 py-3">protocol</th>
+						<th scope="col" class="px-6 py-3">timestamp</th>
+						<th scope="col" class="px-6 py-3">prediction</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					@for (item of flowTemps; track $index) {
+					<tr class="bg-white border-b border-gray-200">
+						<th
+							scope="row"
+							class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
 						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-							/>
-						</svg>
-					</button>
-				</td>
-			</tr>
-			}
-		</tbody>
-	</table>
-</div>
-
-<div class="chart-container">
-    <ngx-echarts
-	
-	[autoResize]="true"
-
-	echarts
-	[options]="options"
-	[merge]="updateOptions"
-	class="chart"
-></ngx-echarts>
-
+							{{ item.src_ip }}
+						</th>
+						<td class="px-6 py-4">
+							{{ item.dst_ip }}
+						</td>
+						<td class="px-6 py-4">
+							{{ item.src_port }}
+						</td>
+						<td class="px-6 py-4">
+							{{ item.dst_port }}
+						</td>
+						<td class="px-6 py-4">
+							{{ item.protocol }}
+						</td>
+						<td class="px-6 py-4">
+							{{ item.timestamp }}
+						</td>
+						<td class="px-6 py-4">{{ item.prediction }}</td>
+						<td>
+							<button>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke-width="1.5"
+									stroke="currentColor"
+									class="size-6"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+									/>
+								</svg>
+							</button>
+						</td>
+					</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
 </div>

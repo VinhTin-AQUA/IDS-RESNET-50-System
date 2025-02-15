@@ -1,8 +1,9 @@
-import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { flows } from './data/flow';
 import type { EChartsCoreOption } from 'echarts/core';
 import { NgxEchartsModule } from 'ngx-echarts';
+import { TrackingService } from './tracking.service';
+import { generateRandomNetworkData, getRandomPrediction } from './util';
 
 type DataT = {
 	name: string;
@@ -21,169 +22,61 @@ export class DashboardComponent {
 	options!: EChartsCoreOption;
 	updateOptions!: EChartsCoreOption;
 
-	private oneDay = 24 * 3600 * 1000;
-	private now!: Date;
-	private value!: number;
-	private data1!: DataT[];
-	private data2!: DataT[];
-	private timer: any;
+	// ==============
+	flowTemps: any = [];
+	timerTemp: any;
+
+	constructor(private trackingService: TrackingService) {}
 
 	ngOnInit(): void {
-		// generate some random testing data:
-		this.data1 = [];
-		this.data2 = [];
-		this.now = new Date(1997, 9, 3);
-		this.value = Math.random() * 1000;
+		this.onRecieFlow();
+	}
 
-		for (let i = 0; i < 1000; i++) {
-			this.data1.push(this.randomData());
-			this.data2.push(this.randomData());
-		}
+	private onRecieFlow() {
+		// Lắng nghe sự kiện 'events' từ server
+		this.trackingService.listen('events').subscribe((data: any) => {
+			// console.log('Received message:', data);
 
-		// initialize chart options:
-		this.options = {
-			title: {
-				text: 'Dynamic Data + Time Axis',
-			},
-			tooltip: {
-				trigger: 'axis',
-				formatter: (params: any) => {
-					params = params[0];
-					const date = new Date(params.name);
-					return (
-						date.getDate() +
-						'/' +
-						(date.getMonth() + 1) +
-						'/' +
-						date.getFullYear() +
-						' : ' +
-						params.value[1]
-					);
-				},
-				axisPointer: {
-					animation: false,
-				},
-			},
-			xAxis: {
-				type: 'time',
-				splitLine: {
-					show: false,
-				},
-			},
-			yAxis: {
-				type: 'value',
-				boundaryGap: [0, '100%'],
-				splitLine: {
-					show: true,
-				},
-			},
-			series: [
-				{
-					name: 'Fake Data',
-					type: 'line',
-					symbol: 'none',
-					sampling: 'lttb',
-					itemStyle: {
-						color: 'rgb(52, 248, 62)',
-					},
-					areaStyle: {
-						color: {
-							type: 'linear',
-							x: 0,
-							y: 0,
-							x2: 0,
-							y2: 1,
-							colorStops: [
-								{
-									offset: 0,
-									color: 'rgba(52, 248, 62, 0.5)', // Màu ở trên
-								},
-								{
-									offset: 1,
-									color: 'rgba(52, 248, 62, 0)', // Màu ở dưới (trong suốt)
-								},
-							],
-						},
-					},
-					data: this.data1,
-				},
+			data.data.src_ip;
+			data.data.dst_ip;
+			data.data.src_port;
+			data.data.dst_port;
+			data.data.protocol;
+			data.data.timestamp;
+			data.data.prediction;
 
-                {
-					name: 'Fake Data',
-					type: 'line',
-					symbol: 'none',
-					sampling: 'lttb',
-					itemStyle: {
-						color: 'rgb(224, 160, 40)',
-					},
-					areaStyle: {
-						color: {
-							type: 'linear',
-							x: 0,
-							y: 0,
-							x2: 0,
-							y2: 1,
-							colorStops: [
-								{
-									offset: 0,
-									color: 'rgba(52, 248, 62, 0.5)', // Màu ở trên
-								},
-								{
-									offset: 1,
-									color: 'rgba(52, 248, 62, 0)', // Màu ở dưới (trong suốt)
-								},
-							],
-						},
-					},
-					data: this.data2,
-				},
-			],
-		};
+			const d = {
+				src_ip: data.data.src_ip,
+				dst_ip: data.data.dst_ip,
+				src_port: data.data.src_port,
+				dst_port: data.data.dst_port,
+				protocol: data.data.protocol,
+				timestamp: data.data.timestamp,
+				// prediction: data.data.prediction,
+				prediction: getRandomPrediction(),
+			};
 
-		// Mock dynamic data:
-		this.timer = setInterval(() => {
-			for (let i = 0; i < 5; i++) {
-				this.data1.shift();
-				this.data2.shift();
-
-                const d1 = this.randomData()
-                const d2 = this.randomData()
-
-                
-				this.data1.push(d1);
-				this.data2.push(d2);
+			if (this.flowTemps.length >= 10) {
+				this.flowTemps.shift();
 			}
 
-			// update series data:
-			this.updateOptions = {
-				series: [
-					{
-						data: this.data1,
-					},
-                    {
-						data: this.data2,
-					},
-				],
-			};
+			this.flowTemps.push(d);
+		});
+	}
+
+	private realTime() {
+		this.timerTemp = setInterval(() => {
+			const d = generateRandomNetworkData();
+			if (this.flowTemps.length >= 10) {
+				this.flowTemps.shift();
+			}
+
+			this.flowTemps.push(d);
 		}, 1000);
 	}
 
 	ngOnDestroy() {
-		clearInterval(this.timer);
-	}
-
-	randomData(): DataT {
-		this.now = new Date(this.now.getTime() + this.oneDay);
-		this.value = this.value/1.5 + Math.random() * 100 - 10;
-        console.log(this.value);
-        
-
-		return {
-			name: this.now.toString(),
-			value: [
-				[this.now.getFullYear(), this.now.getMonth() + 1, this.now.getDate()].join('/'),
-				this.value,
-			],
-		};
+		clearInterval(this.timerTemp);
+		this.trackingService.disconnect();
 	}
 }

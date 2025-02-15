@@ -20,4 +20,5 @@ scikit-learn
 pandas
 numpy
 requests
+urllib3
 confluent-kafka

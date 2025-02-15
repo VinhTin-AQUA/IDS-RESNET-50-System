@@ -4,12 +4,12 @@ import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
 	cors: {
-		origin: 'http://localhost:4200', // Cho phép Angular truy cập
+		origin: '*', // Cho phép Angular truy cập
 		methods: ['GET', 'POST'],
 		credentials: true,
 	},
 })
-export class TrackingGateway {
+export class TrackingGateway {z
 	constructor(private readonly trackingService: TrackingService) {}
 
 	private server: Server;
