@@ -295,7 +295,7 @@ export class Traffic {
 	@Prop({ type: Number })
 	bwd_pkts_b_avg: number;
 
-	@Prop({ type: PredictionResult })
+	@Prop({ type: String, enum: PredictionResult })
 	predictionResult: PredictionResult;
 }
 

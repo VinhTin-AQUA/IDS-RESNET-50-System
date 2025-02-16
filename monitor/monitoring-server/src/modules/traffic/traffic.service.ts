@@ -5,5 +5,5 @@ import { Model } from 'mongoose';
 
 @Injectable()
 export class TrafficService {
-    constructor(@InjectModel(Traffic.name) private userModel: Model<Traffic>) {}
+    constructor(@InjectModel(Traffic.name) private trafficModel: Model<Traffic>) {}
 }
