@@ -10,6 +10,16 @@ CIC DDOS 2019 full dataset
 https://www.kaggle.com/datasets/rodrigorosasilva/cic-ddos2019-30gb-full-dataset-csv-files
 
 
+BoTNeTIoT-L01-v2
+https://www.kaggle.com/datasets/azalhowaide/iot-dataset-for-intrusion-detection-systems-ids?select=BoTNeTIoT-L01-v2.csv
+
+
+RT-IoT2022
+https://www.kaggle.com/datasets/joebeachcapital/real-time-internet-of-things-rt-iot2022
+
+
+
+
 ### Run Pytorch with GPU
 
 CUDA Version	Lệnh cài đặt PyTorch (pip)
