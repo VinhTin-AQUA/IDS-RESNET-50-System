@@ -29,7 +29,7 @@ MANIFEST
 data/cic_ddos_2019_images
 data/botnetiot-l01-v2_images
 data/test
-models/*
+models/*.pth
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
