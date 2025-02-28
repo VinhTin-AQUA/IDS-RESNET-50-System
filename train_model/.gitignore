@@ -26,10 +26,13 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-data/cic_ddos_2019_images
-data/botnetiot-l01-v2_images
-data/test
-models/*.pth
+data/*
+!data/csv/
+
+
+models/*
+!.gitkeep
+
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
