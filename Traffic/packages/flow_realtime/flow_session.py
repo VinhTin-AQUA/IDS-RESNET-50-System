@@ -128,10 +128,9 @@ class FlowSession(DefaultSession):
         flow.add_packet(packet, direction)
         data = flow.get_data()  # Lấy dữ liệu từ flow
 
-
         ############# du doan #############
-        data_x = DataFrame([data])
-        data_x = data_x[constants.SELECT_FEATURES]
+        # data_x = DataFrame([data])
+        # data_x = data_x[constants.SELECT_FEATURES]
         # res = self.model.predict(data_x)
         value_json = json.dumps(data).encode('utf-8')
 
