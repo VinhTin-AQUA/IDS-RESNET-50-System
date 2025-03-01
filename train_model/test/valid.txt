@@ -1,0 +1,10 @@
+data/cic_ddos_2019_images\Syn\136.png
+data/cic_ddos_2019_images\Syn\186.png
+data/cic_ddos_2019_images\Syn\84.png
+data/cic_ddos_2019_images\Syn\63.png
+data/cic_ddos_2019_images\Syn\111.png
+data/cic_ddos_2019_images\Syn\153.png
+data/cic_ddos_2019_images\Syn\149.png
+data/cic_ddos_2019_images\Syn\148.png
+data/cic_ddos_2019_images\Syn\137.png
+data/cic_ddos_2019_images\Syn\145.png
