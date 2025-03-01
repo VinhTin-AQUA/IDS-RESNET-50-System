@@ -6,6 +6,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.ssl_ import create_urllib3_context
 from pandas.core.frame import DataFrame
 from packages.flow_realtime import constants
+from packages.predict.prediction import load_model, predict
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) # loai bo canh bao goi api co SSL khong hop le
 
@@ -24,6 +25,8 @@ class KafkaConsumer:
 
     def consume_messages(self):
         session = requests.Session() # duy tri 1 ket noi, neu tao qua nhieu ket noi se bi rate limiting boi ngrok 
+        self.model = load_model()
+        
 
         while True:
             msg = self.consumer.poll(1.0)
@@ -36,10 +39,10 @@ class KafkaConsumer:
 
                 # dự đoán
                 data_x = DataFrame([message_dict])
-       
 
-                self.model
+                label = predict(self.model , data_x)
 
+                print(label)
                 # gửi kết quả
                 url = "http://2710-113-161-36-10.ngrok-free.app"  # API giả lập
                 headers = {"Content-Type": "application/json"}

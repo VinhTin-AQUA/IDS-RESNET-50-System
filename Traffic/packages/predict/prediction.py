@@ -7,6 +7,30 @@ from torchvision import transforms, models
 from PIL import Image
 
 
+selected_columns = ['Total Fwd Packets', 'Total Backward Packets',
+       'Fwd Packets Length Total', 'Bwd Packets Length Total',
+       'Fwd Packet Length Max', 'Fwd Packet Length Min',
+       'Fwd Packet Length Mean', 'Fwd Packet Length Std',
+       'Bwd Packet Length Max', 'Bwd Packet Length Min',
+       'Bwd Packet Length Mean', 'Bwd Packet Length Std', 'Flow Bytes/s',
+       'Flow Packets/s', 'Flow IAT Mean', 'Flow IAT Std', 'Flow IAT Max',
+       'Flow IAT Min', 'Fwd IAT Total', 'Fwd IAT Mean', 'Fwd IAT Std',
+       'Fwd IAT Max', 'Fwd IAT Min', 'Bwd IAT Total', 'Bwd IAT Mean',
+       'Bwd IAT Std', 'Bwd IAT Max', 'Bwd IAT Min', 'Fwd PSH Flags',
+       'Bwd PSH Flags', 'Fwd URG Flags', 'Bwd URG Flags', 'Fwd Header Length',
+       'Bwd Header Length',
+       'Packet Length Min', 'Packet Length Max', 'Packet Length Mean',
+       'Packet Length Std', 'Packet Length Variance', 
+
+       'Avg Packet Size', 'Avg Fwd Segment Size', 'Avg Bwd Segment Size',
+       'Fwd Avg Bytes/Bulk', 'Fwd Avg Packets/Bulk', 'Fwd Avg Bulk Rate',
+       'Bwd Avg Bytes/Bulk', 'Bwd Avg Packets/Bulk', 'Bwd Avg Bulk Rate',
+       'Subflow Fwd Packets', 'Subflow Fwd Bytes', 'Subflow Bwd Packets',
+       'Subflow Bwd Bytes', 'Init Fwd Win Bytes', 'Init Bwd Win Bytes',
+       'Fwd Act Data Packets', 'Fwd Seg Size Min', 'Active Mean', 'Active Std',
+       'Active Max', 'Active Min', 'Idle Mean', 'Idle Std', 'Idle Max',
+       'Idle Min']
+
 # ==== 2. Load thống kê train ====
 def load_train_stats():
     ## Load min và max từ file
@@ -23,7 +47,7 @@ def preprocess_real_time_data(df_real_time, train_min, train_max):
     df_real_time.fillna(train_min, inplace=True)  # Thay NaN bằng min đã lưu
     
     # Log-transform
-    data_features = np.log1p(df_real_time.clip(lower=0))
+    # data_features = np.log1p(df_real_time.clip(lower=0))
     
     # Chuẩn hóa Min-Max
     data_features = np.log1p(df_real_time + 1)
@@ -44,9 +68,9 @@ def data_to_image(data, img_size=224):
     return img
 
 # ==== 5. Load Model đã Train ====
-def load_model(model_path="model.pth", num_classes=10):
+def load_model(model_path="resnet50_finetuned.pth", num_classes=8):
     """ Load mô hình ResNet50 đã train """
-    model = models.resnet50()
+    model = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V1)
     model.fc = torch.nn.Linear(model.fc.in_features, num_classes)  # Chỉnh số lớp đầu ra
     model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
     model.eval()  # Chế độ đánh giá (không training)
@@ -54,8 +78,14 @@ def load_model(model_path="model.pth", num_classes=10):
 
 
 # ==== 6. Tiền xử lý ảnh và dự đoán ====
-def predict(model, img):
+def predict(model, data):
 
+    # 
+
+    # predict
+    min, max = load_train_stats()
+    data_normalized = preprocess_real_time_data(data, min, max)
+    img = data_to_image(data_normalized)
 
 
 
