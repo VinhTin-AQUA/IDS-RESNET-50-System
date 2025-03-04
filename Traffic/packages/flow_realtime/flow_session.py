@@ -1,4 +1,3 @@
-import csv
 from collections import defaultdict
 
 import requests
@@ -18,6 +17,8 @@ from datetime import datetime
 import csv
 from packages.kafka_service.producer import KafkaProducer
 import json
+from scapy.all import IP, Ether, TCP, UDP
+import socket
 
 GARBAGE_COLLECT_PACKETS = 10000
 
@@ -26,6 +27,7 @@ class FlowSession(DefaultSession):
     """Creates a list of network flows."""
 
     def __init__(self, *args, **kwargs):
+        # Lấy địa chỉ IP của máy bạn
         
         self.flows = {}
         self.csv_line = 0
@@ -123,35 +125,49 @@ class FlowSession(DefaultSession):
         #print(self.packets_count)
 
     def on_packet_received_custom(self, packet):
+        if IP not in packet:
+            return
+
+        ip_src = packet[IP].src
+        print('IP Source: ', ip_src)
+
+        my_ip = socket.gethostbyname(socket.gethostname())
+        if ip_src == my_ip or ip_src in ['18.177.60.68', '13.35.186.105']:
+            print('Khong lay IP nay')
+            return  # Bỏ qua gói tin nếu nguồn là chính máy bạn
+
         direction = PacketDirection.FORWARD
         flow = Flow(packet, direction)
         flow.add_packet(packet, direction)
         data = flow.get_data()  # Lấy dữ liệu từ flow
-
+        data['Label'] = 'UDP'
         ############# du doan #############
-        # data_x = DataFrame([data])
-        # data_x = data_x[constants.SELECT_FEATURES]
-        # res = self.model.predict(data_x)
         value_json = json.dumps(data).encode('utf-8')
 
-        producer = KafkaProducer()
-        producer.send_message('flow', value_json)
+            
+
+        # print("===== Gói tin mới nhận được =====")
+        # packet.show()  # Hiển thị toàn bộ cấu trúc của gói tin
+        # print("=================================")
+
+        # producer = KafkaProducer()
+        # producer.send_message('flow', value_json)
 
         ############# luu file #############
 
         # Kiểm tra xem file có tồn tại và có dữ liệu hay không
-        # file_exists = os.path.exists(self.output_file) and os.stat(self.output_file).st_size > 0
+        file_exists = os.path.exists(self.output_file) and os.stat(self.output_file).st_size > 0
 
-        # # Mở file ở chế độ 'a' để ghi tiếp vào cuối file
-        # with open(self.output_file, 'a', newline='') as file:
-        #     writer = csv.writer(file)
+        # Mở file ở chế độ 'a' để ghi tiếp vào cuối file
+        with open(self.output_file, 'a', newline='') as file:
+            writer = csv.writer(file)
 
-        #     # Nếu file mới hoặc rỗng, ghi header
-        #     if not file_exists:
-        #         writer.writerow(data.keys())  
+            # Nếu file mới hoặc rỗng, ghi header
+            if not file_exists:
+                writer.writerow(data.keys())  
 
-        #     # Ghi dữ liệu mới vào file
-        #     writer.writerow(data.values())
+            # Ghi dữ liệu mới vào file
+            writer.writerow(data.values())
 
     def get_flows(self) -> list:
         return self.flows.values()

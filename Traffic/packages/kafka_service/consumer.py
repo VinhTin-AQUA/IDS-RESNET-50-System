@@ -40,25 +40,31 @@ class KafkaConsumer:
                 # dự đoán
                 data_x = DataFrame([message_dict])
 
-                label = predict(self.model , data_x)
+                label_index = predict(self.model , data_x)
+                labels = ['BENIGN', 'LDAP', 'MSSQL', 'NetBIOS', 'Portmap', 'Syn', 'UDP', 'UDPLag']
+                # print("predict")
+                # print(label_index)
+                print(labels[label_index])
+                message_dict['predict'] = 'labels[label_index]'
 
-                print(label)
                 # gửi kết quả
-                url = "http://2710-113-161-36-10.ngrok-free.app"  # API giả lập
+                url = "http://371d-2401-d800-bab0-c299-d0f0-b9f8-c911-82a0.ngrok-free.app"  # API giả lập
                 headers = {"Content-Type": "application/json"}
                 
                 payload = {
                     "data": message_dict
                 }
+
+                # print('predict:', message_dict['predict'])
                 
                 response = session.post(url + '/tracking/send', json=payload, headers=headers, verify=False)
 
                 if response.status_code == 200 or response.status_code == 201:  # Kiểm tra nếu request thành công
                     # data = response.json()  # Chuyển đổi dữ liệu JSON thành dict
                     # print(data)
-                    # print("gui thanh cong")
+                    print("gui thanh cong")
                     pass
                 else:
                     print(f"Lỗi {response.status_code}")
-                # predict
+                
                 

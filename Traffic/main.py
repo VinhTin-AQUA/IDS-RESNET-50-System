@@ -211,7 +211,8 @@ def get_packet_realtime():
 
     sniffer = AsyncSniffer(
         iface=input_interface,
-        filter="ip and (udp or tcp)",
+        filter=f"ip and (udp or tcp)",
+    
         prn=lambda x: NewFlowSession.on_packet_received_custom(NewFlowSession, packet=x),
         session=NewFlowSession,
         store=False,
