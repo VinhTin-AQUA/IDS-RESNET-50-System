@@ -31,6 +31,7 @@ data/*
 
 
 models/*
+!models/cic-ddos2019
 !.gitkeep
 
 

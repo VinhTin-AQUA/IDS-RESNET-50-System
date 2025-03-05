@@ -1,5 +1,3 @@
 export class FlowDto {
-
-
-	data: string;
+	data: any;
 }

@@ -53,14 +53,14 @@ export class DashboardComponent {
 				protocol: data.data.protocol,
 				timestamp: data.data.timestamp,
 				// prediction: data.data.prediction,
-				prediction: getRandomPrediction(),
+				prediction: data.data.predict,
 			};
 
 			if (this.flowTemps.length >= 10) {
-				this.flowTemps.shift();
+				this.flowTemps.pop();
 			}
 
-			this.flowTemps.push(d);
+			this.flowTemps.unshift(d);
 		});
 	}
 
