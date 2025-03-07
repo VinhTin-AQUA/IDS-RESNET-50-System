@@ -6,6 +6,10 @@ import cv2
 from torchvision import transforms, models
 from PIL import Image
 import torchvision.transforms.functional as F
+import random
+import uuid
+
+
 
 selected_columns = ['tot_fwd_pkts','tot_bwd_pkts','totlen_fwd_pkts','totlen_bwd_pkts',
  'fwd_pkt_len_max','fwd_pkt_len_min','fwd_pkt_len_mean','fwd_pkt_len_std',
@@ -49,31 +53,24 @@ def preprocess_real_time_data(df_real_time, train_min, train_max):
     return data_scaled
 
 # ==== 4. Chuyển đổi dữ liệu thành hình ảnh ====
-def data_to_image(data, img_size=224):
-    # """ Chuyển vector dữ liệu thành ảnh grayscale 224x224 """
-    # img_array = data.to_numpy().reshape((img_size, img_size))  # Giả sử dữ liệu đã có kích thước phù hợp
-    
-    # # Chuẩn hóa về 0-255
-    # img_array = ((img_array - img_array.min()) / (img_array.max() - img_array.min()) * 255).astype(np.uint8)
-    
-    # # Chuyển thành ảnh màu (3 kênh)
-    # img = cv2.merge([img_array, img_array, img_array])  # ResNet50 cần 3 kênh RGB
-    
+def data_to_image(data):
     image_size = (8, 8)
     upscale_factor = 28
 
-    # Chuyển đổi dòng thành ma trận ảnh ban đầu (8x8)
-    image_array = np.array(data.values[0]).reshape(image_size)
-    image_array = np.nan_to_num(image_array, nan=0.0, posinf=1.0, neginf=0.0)  # Thay thế giá trị NaN bằng 0
-    # image_array = np.clip(image_array, 0, 1) # Giới hạn trong khoảng hợp lệ
+    for row in data.values:
+        # Chuyển đổi dòng thành ma trận ảnh ban đầu (8x8)
+        image_array = np.array(row).reshape(image_size)
+        image_array = np.nan_to_num(image_array, nan=0.0, posinf=1.0, neginf=0.0)  # Thay thế giá trị NaN bằng 0
 
-    # Phóng to mỗi pixel np.kron()
-    upscale_matrix = np.ones((upscale_factor, upscale_factor))
-    enlarged_image_array = np.kron(image_array, upscale_matrix)
+        # Phóng to mỗi pixel np.kron()
+        upscale_matrix = np.ones((upscale_factor, upscale_factor))
+        enlarged_image_array = np.kron(image_array, upscale_matrix)
 
-    # Chuyển đổi sang ảnh
-    image = Image.fromarray((enlarged_image_array * 255).astype(np.uint8))  # Chuyển sang RGB
-    image = image.convert("RGB")
+        # Chuyển đổi sang ảnh
+        image = Image.fromarray((enlarged_image_array * 255).astype(np.uint8))  # Chuyển sang RGB
+        image = image.convert("RGB")
+
+        # image.save(f'test/{uuid.uuid4()}.png')
     
     return image
 

@@ -17,7 +17,7 @@ from datetime import datetime
 import csv
 from packages.kafka_service.producer import KafkaProducer
 import json
-from scapy.all import IP, Ether, TCP, UDP
+from scapy.all import IP, Ether, TCP, UDP, get_if_addr
 import socket
 
 GARBAGE_COLLECT_PACKETS = 10000
@@ -125,49 +125,62 @@ class FlowSession(DefaultSession):
         #print(self.packets_count)
 
     def on_packet_received_custom(self, packet):
-        if IP not in packet:
-            return
 
-        ip_src = packet[IP].src
-        print('IP Source: ', ip_src)
-
-        my_ip = socket.gethostbyname(socket.gethostname())
-        if ip_src == my_ip or ip_src in ['18.177.60.68', '13.35.186.105']:
-            print('Khong lay IP nay')
-            return  # Bỏ qua gói tin nếu nguồn là chính máy bạn
-
-        direction = PacketDirection.FORWARD
-        flow = Flow(packet, direction)
-        flow.add_packet(packet, direction)
-        data = flow.get_data()  # Lấy dữ liệu từ flow
-        data['Label'] = 'UDP'
-        ############# du doan #############
-        value_json = json.dumps(data).encode('utf-8')
-
+        while True:  # Chạy vô hạn, không giới hạn thời gian
+            # print('Dang doi')
+            time.sleep(2)
+            # print('doi xong')
             
+            if IP not in packet:
+                return
 
-        # print("===== Gói tin mới nhận được =====")
-        # packet.show()  # Hiển thị toàn bộ cấu trúc của gói tin
-        # print("=================================")
+            ip_src = str(packet[IP].src)
+            # print('IP Source: ', ip_src)
 
-        # producer = KafkaProducer()
-        # producer.send_message('flow', value_json)
+            if str(ip_src) != '192.168.200.213':
+                print('khong phai IP may tan cong: ', ip_src)
+                return
 
-        ############# luu file #############
+            # my_ip = '192.168.200.60'
+            my_ip = get_if_addr("ens33")
+            # print('My IP: ', my_ip)
+            if ip_src == my_ip or ip_src in ['18.177.60.68', '13.35.186.105', '20.42.73.24', '13.107.246.73']:
+                print('Khong lay IP nay: ', ip_src)
 
-        # Kiểm tra xem file có tồn tại và có dữ liệu hay không
-        file_exists = os.path.exists(self.output_file) and os.stat(self.output_file).st_size > 0
+                return  # Bỏ qua gói tin nếu nguồn là chính máy bạn
 
-        # Mở file ở chế độ 'a' để ghi tiếp vào cuối file
-        with open(self.output_file, 'a', newline='') as file:
-            writer = csv.writer(file)
+            direction = PacketDirection.FORWARD
+            flow = Flow(packet, direction)
+            flow.add_packet(packet, direction)
+            data = flow.get_data()  # Lấy dữ liệu từ flow
+            data['Label'] = 'UDP'
+            ############# du doan #############
+            value_json = json.dumps(data).encode('utf-8')
 
-            # Nếu file mới hoặc rỗng, ghi header
-            if not file_exists:
-                writer.writerow(data.keys())  
+                
 
-            # Ghi dữ liệu mới vào file
-            writer.writerow(data.values())
+            # print("===== Gói tin mới nhận được =====")
+            # packet.show()  # Hiển thị toàn bộ cấu trúc của gói tin
+            # print("=================================")
+
+            producer = KafkaProducer()
+            producer.send_message('flow', value_json)
+
+            ############# luu file #############
+            # print("luu file")
+            # Kiểm tra xem file có tồn tại và có dữ liệu hay không
+            file_exists = os.path.exists(self.output_file) and os.stat(self.output_file).st_size > 0
+
+            # Mở file ở chế độ 'a' để ghi tiếp vào cuối file
+            with open(self.output_file, 'a', newline='') as file:
+                writer = csv.writer(file)
+
+                # Nếu file mới hoặc rỗng, ghi header
+                if not file_exists:
+                    writer.writerow(data.keys())  
+
+                # Ghi dữ liệu mới vào file
+                writer.writerow(data.values())
 
     def get_flows(self) -> list:
         return self.flows.values()

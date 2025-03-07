@@ -3,6 +3,7 @@ from scapy.sendrecv import AsyncSniffer
 from packages.flow_realtime.flow_session import generate_session_class
 import threading, time
 from packages.kafka_service.consumer import KafkaConsumer
+from scapy.all import IP, Ether, TCP, UDP
 
 def create_sniffer(
     input_file, input_interface, output_mode, output_file
@@ -198,6 +199,14 @@ def convert_pcap_to_csv():
         
 # ============ get packets realtime ===============
 
+def throttled_packet_handler(session, packet):
+    if not (packet.haslayer(TCP) or packet.haslayer(UDP)):
+        # print("⚠ Gói tin không phải TCP/UDP -> Bỏ qua")
+        return  # Bỏ qua gói tin không hợp lệ
+     
+      # Nghỉ 1s trước khi xử lý gói tiếp theo
+    session
+
 def get_packet_realtime():
     # convert udp flow
     output = 'csv/real_time_flows.csv'
@@ -212,7 +221,6 @@ def get_packet_realtime():
     sniffer = AsyncSniffer(
         iface=input_interface,
         filter=f"ip and (udp or tcp)",
-    
         prn=lambda x: NewFlowSession.on_packet_received_custom(NewFlowSession, packet=x),
         session=NewFlowSession,
         store=False,
@@ -221,11 +229,8 @@ def get_packet_realtime():
     print("\033[32mIn predict mode\033[0m")
     print("----------------------------------")
 
-    sniffer.start()
-
     try:
-        while True:  # Chạy vô hạn, không giới hạn thời gian
-            time.sleep(1)  # Tránh tiêu tốn CPU quá mức
+        sniffer.start()
     except KeyboardInterrupt:
         print("\033[31mInterrupted by user!\033[0m")
         sniffer.stop()
