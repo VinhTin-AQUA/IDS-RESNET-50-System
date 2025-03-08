@@ -37,21 +37,13 @@ export class DashboardComponent {
 		this.trackingService.listen('events').subscribe((data: any) => {
 			// console.log('Received message:', data);
 
-			data.data.src_ip;
-			data.data.dst_ip;
-			data.data.src_port;
-			data.data.dst_port;
-			data.data.protocol;
-			data.data.timestamp;
-			data.data.prediction;
-
 			const d = {
-				src_ip: data.data.src_ip,
-				dst_ip: data.data.dst_ip,
-				src_port: data.data.src_port,
-				dst_port: data.data.dst_port,
-				protocol: data.data.protocol,
-				timestamp: data.data.timestamp,
+				src_ip: data.data['Source IP'],
+				dst_ip: data.data['Dest IP'],
+				src_port: data.data['Source Port'],
+				dst_port: data.data['Dest Port'],
+				protocol: data.data['Protocol'],
+				timestamp: data.data['Timestamp'],
 				// prediction: data.data.prediction,
 				prediction: data.data.predict,
 			};
