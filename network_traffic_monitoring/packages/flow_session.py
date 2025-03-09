@@ -1,16 +1,16 @@
 import csv
 from collections import defaultdict
 from scapy.sessions import DefaultSession
-
 from . import constants
 from .features.context.packet_direction import PacketDirection
 from .features.context.packet_flow_key import get_packet_flow_key
 from .flow import Flow
-from pandas.core.frame import DataFrame
 import os
 import time
 from scapy.all import get_if_addr, IP
-from .prediction.resnet50_prediction import Resnet50Prediction
+import json
+
+from .kafka_service.producer import KafkaProducer
 
 GARBAGE_COLLECT_PACKETS = 12
 
@@ -25,8 +25,9 @@ class FlowSession(DefaultSession):
         self.curr_timestamp = time.time()
         self.packets_count = 0
         self.clumped_flows_per_label = defaultdict(list)
+        self.producer = KafkaProducer()
 
-        self.model = Resnet50Prediction()
+        # self.model = Resnet50Prediction()
 
         super(FlowSession, self).__init__(*args, **kwargs)
     
@@ -238,7 +239,7 @@ class FlowSession(DefaultSession):
                             del self.flows[k]
                             del perflow      
 
-    def handle_flow(self, data):
+    def save_csv(self, data):
         file_exists = os.path.exists(self.output_file) and os.stat(self.output_file).st_size > 0
 
         # Mở file ở chế độ 'a' để ghi tiếp vào cuối file
@@ -250,14 +251,26 @@ class FlowSession(DefaultSession):
                 
                 writer.writerow(data.keys())  
                 
-            data['Label'] = 'SYN'
             # Ghi dữ liệu mới vào file
             writer.writerow(data.values())
 
-        # predict
-        predict_label = self.model.predict(data)
-        print(predict_label)
+    def handle_flow(self, data):
+        data['Label'] = 'Unknow'
+        value_json = json.dumps(data).encode('utf-8')
+        self.producer.send_message('flow', value_json)
+        
+
+        
+
+        # print(data['predict'])
+        # self.save_csv(data)
+
+        
+
+        
+        
  
+
 
 def generate_session_class(output_file):
     return type(
@@ -267,3 +280,4 @@ def generate_session_class(output_file):
             "output_file": output_file,
         },
     )
+

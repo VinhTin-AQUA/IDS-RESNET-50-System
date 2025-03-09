@@ -1,7 +1,7 @@
-import argparse
 from scapy.sendrecv import AsyncSniffer
 from packages.flow_session import generate_session_class
 import threading, time
+from packages.kafka_service.consumer import KafkaConsumer
 
 def create_sniffer(
     input_interface, NewFlowSession, session_instance, 
@@ -66,6 +66,9 @@ def get_flows():
             t.cancel()
             t.join()
 
+def predict_and_send_result():
+    consumer = KafkaConsumer()
+    consumer.consume_messages()
 
 def main():
     get_flows()

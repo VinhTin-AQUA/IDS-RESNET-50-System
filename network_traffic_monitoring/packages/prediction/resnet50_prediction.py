@@ -19,6 +19,29 @@ class Resnet50Prediction:
         # self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.device = torch.device("cpu")
         self.labels = ['BENIGN', 'LDAP', 'MSSQL', 'NetBIOS', 'Portmap', 'Syn', 'UDP', 'UDPLag']
+        self.selected_columns = ['Total Fwd Packets', 'Total Backward Packets',
+                                'Fwd Packets Length Total', 'Bwd Packets Length Total',
+                                'Fwd Packet Length Max', 'Fwd Packet Length Min',
+                                'Fwd Packet Length Mean', 'Fwd Packet Length Std',
+                                'Bwd Packet Length Max', 'Bwd Packet Length Min',
+                                'Bwd Packet Length Mean', 'Bwd Packet Length Std', 'Flow Bytes/s',
+                                'Flow Packets/s', 'Flow IAT Mean', 'Flow IAT Std', 'Flow IAT Max',
+                                'Flow IAT Min', 'Fwd IAT Total', 'Fwd IAT Mean', 'Fwd IAT Std',
+                                'Fwd IAT Max', 'Fwd IAT Min', 'Bwd IAT Total', 'Bwd IAT Mean',
+                                'Bwd IAT Std', 'Bwd IAT Max', 'Bwd IAT Min', 'Fwd PSH Flags',
+                                'Bwd PSH Flags', 'Fwd URG Flags', 'Bwd URG Flags', 'Fwd Header Length',
+                                'Bwd Header Length',
+                                'Packet Length Min', 'Packet Length Max', 'Packet Length Mean',
+                                'Packet Length Std', 'Packet Length Variance', 
+                                'CWE Flag Count', 'ECE Flag Count',
+                                'Avg Packet Size', 'Avg Fwd Segment Size', 'Avg Bwd Segment Size',
+                                'Fwd Avg Bytes/Bulk', 'Fwd Avg Packets/Bulk', 
+                                'Bwd Avg Bytes/Bulk', 'Bwd Avg Packets/Bulk', 
+                                'Subflow Fwd Packets', 'Subflow Fwd Bytes', 'Subflow Bwd Packets',
+                                'Subflow Bwd Bytes', 'Init Fwd Win Bytes', 'Init Bwd Win Bytes',
+                                'Fwd Act Data Packets', 'Fwd Seg Size Min', 'Active Mean', 'Active Std',
+                                'Active Max', 'Active Min', 'Idle Mean', 'Idle Std', 'Idle Max',
+                                'Idle Min']
         self.model = self.load_model()
 
     def load_model(self):
@@ -42,8 +65,8 @@ class Resnet50Prediction:
         std = pd.Series(data["std"])
         return mean, std
 
-    def normalize(self, data_dict):
-        data_df = DataFrame([data_dict])
+    def normalize(self, df):
+        data_df = DataFrame([df])
         data_df.replace([-np.inf, np.inf], 0, inplace=True)
         data_df.fillna(self.mean, inplace=True)
         data_df = self.standardScaler.transform(data_df)
@@ -74,7 +97,8 @@ class Resnet50Prediction:
         
         return image
 
-    def predict(self, data):
+    def predict(self, df):
+        data = df[self.selected_columns]
         data_normalize = self.normalize(data)
         img = self.data_to_image(data_normalize)
 
@@ -94,5 +118,4 @@ class Resnet50Prediction:
             output = self.model(img_tensor)
         predicted_class = torch.argmax(output, dim=1).item()
 
-        
-        print(f'Predicted label: {labels[predicted_class]}')
+        return self.labels[predicted_class]
