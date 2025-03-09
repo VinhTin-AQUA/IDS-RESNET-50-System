@@ -249,8 +249,11 @@
         ```
         
         --flood : Send packets continuously without waiting for a response
+        
         --udp : Use UDP protocol
+        
         -p 80 : Send UDP packet to port 80 of destination machine (port can be changed)
+        
         --data 1200 : Payload size is 1200 bytes
 
         Ex:
@@ -264,7 +267,9 @@
         ```
         
         -S : Send SYN packet (same as TCP handshake)
+        
         --flood : Send continuously without waiting for response
+        
         -p 80 : Target port (subject to change)
 
     * Create TCP packet with spoofed IP address:
@@ -273,7 +278,9 @@
         ```
 
         -a 192.168.1.100 : Source IP address spoofing
+        
         -S : Send SYN packet
+        
         -p 80 : Target port
 
     * Send custom packet (RAW Packet)
@@ -282,6 +289,7 @@
         ```
 
         -PS : Send TCP packet with both PSH and SYN flags
+        
         -p 443 : Send to port 443 (HTTPS)
 
     * Port Scanning
@@ -314,8 +322,11 @@
             ```
 
             RANDOM % 1701 + 300 → Generate random numbers from 300 to 2000
+            
             --rand-source →Spoofing random source IP
+            
             --fast → Send packets faster (no waiting between packets)
+            
             while true → Infinite loop, send continuously
             
         - Run attack wait 1 second then send next packet
