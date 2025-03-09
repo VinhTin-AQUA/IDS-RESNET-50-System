@@ -10,6 +10,7 @@ from pandas.core.frame import DataFrame
 import os
 import time
 from scapy.all import get_if_addr, IP
+from .prediction.resnet50_prediction import Resnet50Prediction
 
 GARBAGE_COLLECT_PACKETS = 12
 
@@ -24,6 +25,9 @@ class FlowSession(DefaultSession):
         self.curr_timestamp = time.time()
         self.packets_count = 0
         self.clumped_flows_per_label = defaultdict(list)
+
+        self.model = Resnet50Prediction()
+
         super(FlowSession, self).__init__(*args, **kwargs)
     
     def toPacketList(self):
@@ -251,7 +255,8 @@ class FlowSession(DefaultSession):
             writer.writerow(data.values())
 
         # predict
-
+        predict_label = self.model.predict(data)
+        print(predict_label)
  
 
 def generate_session_class(output_file):

@@ -6,7 +6,7 @@ pandas
 numpy
 requests
 # urllib3
-# confluent-kafka
+confluent-kafka
 # torch
 # torchvision
 # opencv-python
