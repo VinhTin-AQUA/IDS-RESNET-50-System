@@ -1,0 +1,12 @@
+jupyterlab
+scipy
+scapy
+scikit-learn
+pandas
+numpy
+requests
+# urllib3
+# confluent-kafka
+# torch
+# torchvision
+# opencv-python
