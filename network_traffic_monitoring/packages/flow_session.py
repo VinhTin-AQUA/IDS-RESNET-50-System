@@ -256,21 +256,12 @@ class FlowSession(DefaultSession):
 
     def handle_flow(self, data):
         data['Label'] = 'Unknow'
+        data['Predict'] = 'Unknow'
+        # self.save_csv(data)
+
         value_json = json.dumps(data).encode('utf-8')
         self.producer.send_message('flow', value_json)
         
-
-        
-
-        # print(data['predict'])
-        # self.save_csv(data)
-
-        
-
-        
-        
- 
-
 
 def generate_session_class(output_file):
     return type(

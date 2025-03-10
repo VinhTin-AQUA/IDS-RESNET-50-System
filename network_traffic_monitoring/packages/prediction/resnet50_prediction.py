@@ -66,17 +66,17 @@ class Resnet50Prediction:
         return mean, std
 
     def normalize(self, df):
-        data_df = DataFrame([df])
-        data_df.replace([-np.inf, np.inf], 0, inplace=True)
-        data_df.fillna(self.mean, inplace=True)
-        data_df = self.standardScaler.transform(data_df)
+        data = df.copy()
+        data.replace([-np.inf, np.inf], 0, inplace=True)
+        data.fillna(self.mean, inplace=True)
+        data_df = self.standardScaler.transform(data)
 
         data_df = np.log1p(data_df + 1)
         data_scaled = pd.DataFrame(MinMaxScaler(feature_range=(0, 255)).fit_transform(data_df).astype(np.uint8))
 
         return data_scaled
 
-    def data_to_image(data):
+    def data_to_image(self, data):
         image_size = (8, 8)
         upscale_factor = 28
 

@@ -71,7 +71,16 @@ def predict_and_send_result():
     consumer.consume_messages()
 
 def main():
-    get_flows()
+
+    get_flows_thread = threading.Thread(target=get_flows, daemon=True) 
+    predict_thread = threading.Thread(target=predict_and_send_result, daemon=True)
+
+    get_flows_thread.start()
+    predict_thread.start()
+
+    
+    get_flows_thread.join()
+    predict_thread.join()
 
 
 if __name__ == "__main__":
