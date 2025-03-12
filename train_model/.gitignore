@@ -29,6 +29,8 @@ MANIFEST
 data/*
 !data/csv/
 
+/temp
+
 
 models/*
 !models/cic-ddos2019
