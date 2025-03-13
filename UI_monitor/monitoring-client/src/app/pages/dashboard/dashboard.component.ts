@@ -45,7 +45,7 @@ export class DashboardComponent {
 				protocol: data.data['Protocol'],
 				timestamp: data.data['Timestamp'],
 				// prediction: data.data.prediction,
-				prediction: data.data.predict,
+				prediction: data.data['Predict'],
 			};
 
 			if (this.flowTemps.length >= 10) {
