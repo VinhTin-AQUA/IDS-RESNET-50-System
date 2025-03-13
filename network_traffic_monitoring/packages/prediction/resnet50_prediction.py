@@ -14,11 +14,10 @@ class Resnet50Prediction:
 
     def __init__(self, *args, **kwargs):
         
-        self.standardScaler = joblib.load("scaler/standardScaler.pkl")
         (self.mean, self.std) = self.load_train_stats()
         # self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.device = torch.device("cpu")
-        self.labels = ['BENIGN', 'LDAP', 'MSSQL', 'NetBIOS', 'Portmap', 'Syn', 'UDP', 'UDPLag']
+        self.labels = ['BENIGN', 'LDAP', 'MSSQL', 'Portmap', 'Syn', 'UDP', 'UDPLag']
         self.selected_columns = ['Total Fwd Packets', 'Total Backward Packets',
                                 'Fwd Packets Length Total', 'Bwd Packets Length Total',
                                 'Fwd Packet Length Max', 'Fwd Packet Length Min',
@@ -41,7 +40,7 @@ class Resnet50Prediction:
                                 'Subflow Bwd Bytes', 'Init Fwd Win Bytes', 'Init Bwd Win Bytes',
                                 'Fwd Act Data Packets', 'Fwd Seg Size Min', 'Active Mean', 'Active Std',
                                 'Active Max', 'Active Min', 'Idle Mean', 'Idle Std', 'Idle Max',
-                                'Idle Min']
+                                'Idle Min',]
         self.model = self.load_model()
 
     def load_model(self):
@@ -69,9 +68,14 @@ class Resnet50Prediction:
         data = df.copy()
         data.replace([-np.inf, np.inf], 0, inplace=True)
         data.fillna(self.mean, inplace=True)
-        data_df = self.standardScaler.transform(data)
 
-        data_df = np.log1p(data_df + 1)
+        self.std.replace(0, 1, inplace=True) # 
+
+        data = (data - self.mean) / self.std
+
+        data.fillna(0, inplace=True)
+
+        data_df = np.log1p(data + 1)
         data_scaled = pd.DataFrame(MinMaxScaler(feature_range=(0, 255)).fit_transform(data_df).astype(np.uint8))
 
         return data_scaled

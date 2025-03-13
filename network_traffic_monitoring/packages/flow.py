@@ -225,12 +225,12 @@ class Flow:
             ),
 
             #some issue
-            #"fwd_blk_rate_avg": float(
-            #    flow_bytes.get_bulk_rate(PacketDirection.FORWARD)
-            #),
-            #"bwd_blk_rate_avg": float(
-            #    flow_bytes.get_bulk_rate(PacketDirection.REVERSE)
-            #),
+            "Fwd Avg Bulk Rate": float(
+               flow_bytes.get_bulk_rate(PacketDirection.FORWARD)
+            ),
+            "Bwd Avg Bulk Rate": float(
+               flow_bytes.get_bulk_rate(PacketDirection.REVERSE)
+            ),
         }
         #print(self.start_timestamp)
         #print(packet_time.get_packet_iat())

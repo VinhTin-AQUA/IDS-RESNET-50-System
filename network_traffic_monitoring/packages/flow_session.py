@@ -41,15 +41,15 @@ class FlowSession(DefaultSession):
         print("\033[31mFinish!\033[0m")\
 
     def on_packet_received(self, packet):
-        my_ip = str(get_if_addr("ens33"))
-        ip_src = str(packet[IP].src)
+        # my_ip = str(get_if_addr("ens33"))
+        # ip_src = str(packet[IP].src)
         
-        if ip_src == my_ip:
-            # print('khong phai IP may tan cong: ', ip_src)
-            return
+        # if ip_src == my_ip:
+        #     # print('khong phai IP may tan cong: ', ip_src)
+        #     return
 
         count = 0
-        direction = PacketDirection.REVERSE
+        direction = PacketDirection.FORWARD
         proto = None
         if "TCP" in packet:
             proto = "TCP"
@@ -74,7 +74,7 @@ class FlowSession(DefaultSession):
 
             if flow is None:
                 # If no flow exists create a new flow
-                direction = PacketDirection.REVERSE
+                direction = PacketDirection.FORWARD
                 flow = Flow(packet, direction)
                 packet_flow_key = get_packet_flow_key(packet, direction)
                 
@@ -100,11 +100,11 @@ class FlowSession(DefaultSession):
             #elif self.packets_count % GARBAGE_COLLECT_PACKETS == 0:
             #    self.garbage_collect(packet.time)
         
-        # if self.packets_count % GARBAGE_COLLECT_PACKETS == 0:
-        #     print(4)
-        #     self.garbage_collect(packet.time)
-        # elif (packet.time - self.curr_timestamp) >= constants.FLOW_TIMEOUT:
-        if (packet.time - self.curr_timestamp) >= constants.FLOW_TIMEOUT:
+        if self.packets_count % GARBAGE_COLLECT_PACKETS == 0:
+            print(4)
+            self.garbage_collect(packet.time)
+        elif (packet.time - self.curr_timestamp) >= constants.FLOW_TIMEOUT:
+        # if (packet.time - self.curr_timestamp) >= constants.FLOW_TIMEOUT:
             self.garbage_collect(packet.time)
             self.curr_timestamp = packet.time
 
@@ -255,12 +255,12 @@ class FlowSession(DefaultSession):
             writer.writerow(data.values())
 
     def handle_flow(self, data):
-        data['Label'] = 'Unknow'
-        data['Predict'] = 'Unknow'
-        # self.save_csv(data)
+        data['Label'] = 'Syn'
+        # data['Predict'] = 'Unknow'
+        self.save_csv(data)
 
-        value_json = json.dumps(data).encode('utf-8')
-        self.producer.send_message('flow', value_json)
+        # value_json = json.dumps(data).encode('utf-8')
+        # self.producer.send_message('flow', value_json)
         
 
 def generate_session_class(output_file):
