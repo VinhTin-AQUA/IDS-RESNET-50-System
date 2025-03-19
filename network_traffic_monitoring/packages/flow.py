@@ -110,7 +110,8 @@ class Flow:
 
             # Basic information from packet times
             "Timestamp": packet_time.get_time_stamp(),
-            "Flow Duration": 1e6 * packet_time.get_duration(),
+            # "Flow Duration": 1e6 * packet_time.get_duration(),
+            "Flow Duration": 1e4 * packet_time.get_duration(),
             "Flow Bytes/s": flow_bytes.get_rate(),
             "Flow Packets/s": packet_count.get_rate(),
             "Fwd Packets/s": packet_count.get_rate(PacketDirection.FORWARD),

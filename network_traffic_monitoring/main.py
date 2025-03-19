@@ -11,7 +11,7 @@ def create_sniffer(
     
     return AsyncSniffer(
         iface=input_interface,
-        filter="ip and (tcp or udp)",
+        filter="ip and (tcp or udp)", # include fragments
         prn=packet_handler,
         session=NewFlowSession,
         store=False,
@@ -73,14 +73,14 @@ def predict_and_send_result():
 def main():
 
     get_flows_thread = threading.Thread(target=get_flows, daemon=True) 
-    predict_thread = threading.Thread(target=predict_and_send_result, daemon=True)
+    # predict_thread = threading.Thread(target=predict_and_send_result, daemon=True)
 
     get_flows_thread.start()
-    predict_thread.start()
+    # predict_thread.start()
 
     
     get_flows_thread.join()
-    predict_thread.join()
+    # predict_thread.join()
 
 
 if __name__ == "__main__":
