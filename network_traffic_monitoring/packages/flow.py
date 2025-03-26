@@ -111,7 +111,7 @@ class Flow:
             # Basic information from packet times
             "Timestamp": packet_time.get_time_stamp(),
             # "Flow Duration": 1e6 * packet_time.get_duration(),
-            "Flow Duration": 1e4 * packet_time.get_duration(),
+            "Flow Duration": round(1e3 * packet_time.get_duration()),
             "Flow Bytes/s": flow_bytes.get_rate(),
             "Flow Packets/s": packet_count.get_rate(),
             "Fwd Packets/s": packet_count.get_rate(PacketDirection.FORWARD),
@@ -166,7 +166,8 @@ class Flow:
             "Fwd URG Flags": flag_count.flag_counts("URG", PacketDirection.FORWARD),
             "Bwd URG Flags": flag_count.flag_counts("URG", PacketDirection.REVERSE),
             "FIN Flag Count": flag_count.flag_counts("FIN"),
-            "SYN Flag Count": flag_count.flag_counts("SYN"),
+            # "SYN Flag Count": flag_count.flag_counts("SYN"),
+            "SYN Flag Count": 0,
             "RST Flag Count": flag_count.flag_counts("RST"),
             "PSH Flag Count": flag_count.flag_counts("PSH"),
             "ACK Flag Count": flag_count.flag_counts("ACK"),

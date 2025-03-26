@@ -111,7 +111,7 @@ class FlowSession(DefaultSession):
         #     print(4)
         #     self.garbage_collect(packet.time)
 
-        print(f"packet.time - self.curr_timestamp: {packet.time - self.curr_timestamp}")
+        # print(f"packet.time - self.curr_timestamp: {packet.time - self.curr_timestamp}")
 
         if (packet.time - self.curr_timestamp) >= constants.FLOW_TIMEOUT:
             print(5)
@@ -130,7 +130,6 @@ class FlowSession(DefaultSession):
         # TODO: Garbage Collection / Feature Extraction should have a separate thread
         flow = self.flows.get(flow_key)
         
-
         if pkt != None:
             if ("TCP" in flow.packets[0][0] and "TCP" in pkt):
                 if (latest_time - flow.start_timestamp) > constants.FLOW_TIMEOUT:
@@ -251,7 +250,7 @@ class FlowSession(DefaultSession):
                     keys = list(self.flows.keys())
                     for k in keys:
                         perflow = self.flows.get(k)
-                        print("latest_time - perflow.start_timestamp", latest_time - perflow.start_timestamp)
+                        # print("latest_time - perflow.start_timestamp", latest_time - perflow.start_timestamp)
                         # if (latest_time - perflow.start_timestamp) > constants.FLOW_TIMEOUT:
                             
                         perflow.last_active_update_check = True
@@ -261,8 +260,9 @@ class FlowSession(DefaultSession):
 
                         # if (direction.count(PacketDirection.REVERSE) != 0) and (len(flow.packets) >= 6): # we don't want the unresponse flow to be considered
                         direction = [ pkt[1] for pkt in perflow.packets]   
-                        print(f"len(perflow.packets): {len(perflow.packets)} >= constants.MIN_PACKAGE_COUNT_PERFLOW {constants.MIN_PACKAGE_COUNT_PERFLOW}", len(perflow.packets) >= constants.MIN_PACKAGE_COUNT_PERFLOW)                               
+                                                     
                         if len(perflow.packets) >= constants.MIN_PACKAGE_COUNT_PERFLOW:
+                            print(f"len(perflow.packets): {len(perflow.packets)} >= constants.MIN_PACKAGE_COUNT_PERFLOW {constants.MIN_PACKAGE_COUNT_PERFLOW}", len(perflow.packets) >= constants.MIN_PACKAGE_COUNT_PERFLOW) 
                             data = perflow.get_data()
                     
                             self.handle_flow(data)
@@ -288,7 +288,7 @@ class FlowSession(DefaultSession):
             writer.writerow(data.values())
 
     def handle_flow(self, data):
-        data['Label'] = 'UDP'
+        data['Label'] = 'Syn'
         # data['Predict'] = 'Unknow'
         self.save_csv(data)
 
