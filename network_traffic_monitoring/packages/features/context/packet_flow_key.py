@@ -34,22 +34,14 @@ def get_packet_flow_key(packet, direction) -> tuple:
     if direction == PacketDirection.FORWARD:
         dest_ip = packet["IP"].dst
         src_ip = packet["IP"].src
-
-        # src_port = packet[protocol].sport
-        # dest_port = packet[protocol].dport
-
-        src_port = 4000
-        dest_port = 5000
+        src_port = packet[protocol].sport
+        dest_port = packet[protocol].dport
         proto = packet.proto
+        return proto, dest_port
     else:
         dest_ip = packet["IP"].src
         src_ip = packet["IP"].dst
-        # src_port = packet[protocol].dport
-        # dest_port = packet[protocol].sport
-
-        src_port = 4000
-        dest_port = 5000
-
+        src_port = packet[protocol].dport
+        dest_port = packet[protocol].sport
         proto = packet.proto
-    
-    return dest_ip, src_ip, src_port, dest_port, proto
+        return proto, dest_port

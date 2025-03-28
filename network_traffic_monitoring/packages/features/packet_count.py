@@ -39,7 +39,7 @@ class PacketCount:
         if duration == 0:
             rate = 0
         else:
-            rate = self.get_total(packet_direction) / (duration/1000000)
+            rate = self.get_total(packet_direction) / duration
 
         return rate
 

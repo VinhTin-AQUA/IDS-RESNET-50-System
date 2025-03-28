@@ -23,13 +23,15 @@ class Flow:
             direction (Enum): The direction the packet is going ove the wire.
         """
 
-        (
-            self.dest_ip,
-            self.src_ip,
-            self.src_port,
-            self.dest_port,
-            self.protocol,
-        ) = packet_flow_key.get_packet_flow_key(packet, direction)
+        # (
+        #     self.dest_ip,
+        #     self.src_ip,
+        #     self.src_port,
+        #     self.dest_port,
+        #     self.protocol,
+        # ) = packet_flow_key.get_packet_flow_key(packet, direction)
+
+        (self.protocol, self.dest_port )= packet_flow_key.get_packet_flow_key(packet, direction)
 
         self.packets = []
         self.flow_interarrival_time = []
@@ -102,9 +104,9 @@ class Flow:
 
         data = {
             # Basic IP information
-            "Source IP": self.src_ip,
-            "Dest IP": self.dest_ip,
-            "Source Port": self.src_port,
+            # "Source IP": self.src_ip,
+            # "Dest IP": self.dest_ip,
+            # "Source Port": self.src_port,
             "Dest Post": self.dest_port,
             "Protocol": self.protocol,
 

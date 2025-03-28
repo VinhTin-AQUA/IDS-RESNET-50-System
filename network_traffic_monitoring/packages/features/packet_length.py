@@ -1,6 +1,6 @@
 import numpy
 from scipy import stats as stat
-from scapy.all import get_if_addr, IP, TCP, Raw
+
 
 class PacketLength:
     """This class extracts features related to the Packet Lengths.
@@ -17,37 +17,20 @@ class PacketLength:
     def __init__(self, feature):
         self.feature = feature
 
-    # def get_packet_length(self, packet_direction=None) -> list:
-    #     """Creates a list of packet lengths.
-
-    #     Returns:
-    #         packet_lengths (List[int]):
-
-    #     """
-    #     if packet_direction is not None:
-    #         return [
-    #             len(packet)
-    #             for packet, direction in self.feature.packets
-    #             if direction == packet_direction
-    #         ]
-    #     return [len(packet) for packet, _ in self.feature.packets]
-
     def get_packet_length(self, packet_direction=None) -> list:
         """Creates a list of packet lengths.
 
         Returns:
             packet_lengths (List[int]):
+
         """
         if packet_direction is not None:
             return [
-                len(packet[Raw]) if packet.haslayer(Raw) else 0
+                len(packet)
                 for packet, direction in self.feature.packets
                 if direction == packet_direction
             ]
-        return [
-            len(packet[Raw]) if packet.haslayer(Raw) else 0
-            for packet, _ in self.feature.packets
-        ]
+        return [len(packet) for packet, _ in self.feature.packets]
 
     def get_header_length(self, packet_direction=None) -> list:
         """Creates a list of packet lengths.
@@ -81,7 +64,6 @@ class PacketLength:
 
         """
         return sum(self.get_header_length(packet_direction))
-        
 
     def get_min_header(self, packet_direction=None) -> int:
         """Min the summary header lengths.
