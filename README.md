@@ -367,13 +367,8 @@ https://www.kaggle.com/datasets/azalhowaide/iot-dataset-for-intrusion-detection-
 
 ### Attack tools
 
-Python SYN Flood Attack Tool
-https://github.com/EmreOvunc/Python-SYN-Flood-Attack-Tool
-
-
-LOIC
-https://github.com/NewEraCracker/LOIC?tab=readme-ov-file
-
+MHDDoS
+https://github.com/MatrixTM/MHDDoS
 
 Hping3 Library
 https://www.kali.org/tools/hping3/

