@@ -1,6 +1,7 @@
 import { MessageBody, SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
 import { TrackingService } from './tracking.service';
 import { Server, Socket } from 'socket.io';
+import { TrafficService } from '../traffic/traffic.service';
 
 @WebSocketGateway({
 	cors: {
@@ -9,8 +10,11 @@ import { Server, Socket } from 'socket.io';
 		credentials: true,
 	},
 })
-export class TrackingGateway {z
-	constructor(private readonly trackingService: TrackingService) {}
+export class TrackingGateway {
+	z;
+	constructor(
+		private readonly trackingService: TrackingService,
+	) {}
 
 	private server: Server;
 
@@ -30,14 +34,14 @@ export class TrackingGateway {z
 		console.log(`Client disconnected: ${client.id}`);
 	}
 
-    // lắng nghe messge từ client
+	// lắng nghe messge từ client
 	@SubscribeMessage('events')
 	handleEvent(@MessageBody() data: string) {
 		console.log(data);
 	}
 
 	// Hàm gửi message từ server đến tất cả client
-	sendMessageToClients(message: any) {
-		this.server.emit('events', message);
+	sendMessageToClients(body: any) {
+		this.server.emit('events', body);
 	}
 }

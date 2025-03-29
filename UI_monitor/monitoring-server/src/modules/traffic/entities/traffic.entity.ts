@@ -8,196 +8,187 @@ export class Traffic {
 	_id: Types.ObjectId;
 
 	@Prop({ type: Number })
-	src_ip: string;
+	destPost: number;
 
-	@Prop({ type: Number })
-	dst_ip: string;
-
-	@Prop({ type: Number })
-	src_port: number;
-
-	@Prop({ type: Number })
-	dst_port: number;
-
-	@Prop({ type: Number })
-	protocol: number;
+	@Prop({})
+	protocol: string;
 
 	@Prop({ type: Date })
-	timestamp: Date; //'2025-02-11 22:39:32'
+	timestamp: Date;
 
 	@Prop({ type: Number })
-	flow_duration: number;
+	flowDuration: number;
 
 	@Prop({ type: Number })
-	flow_byts_s: number;
+	flowBytesPerSec: number;
 
 	@Prop({ type: Number })
-	flow_pkts_s: number;
+	flowPacketsPerSec: number;
 
 	@Prop({ type: Number })
-	fwd_pkts_s: number;
+	fwdPacketsPerSec: number;
 
 	@Prop({ type: Number })
-	bwd_pkts_s: number;
+	bwdPacketsPerSec: number;
 
 	@Prop({ type: Number })
-	tot_fwd_pkts: number;
+	totalFwdPackets: number;
 
 	@Prop({ type: Number })
-	tot_bwd_pkts: number;
+	totalBackwardPackets: number;
 
 	@Prop({ type: Number })
-	totlen_fwd_pkts: number;
+	fwdPacketsLengthTotal: number;
 
 	@Prop({ type: Number })
-	totlen_bwd_pkts: number;
+	bwdPacketsLengthTotal: number;
 
 	@Prop({ type: Number })
-	fwd_pkt_len_max: number;
+	fwdPacketLengthMax: number;
 
 	@Prop({ type: Number })
-	fwd_pkt_len_min: number;
+	fwdPacketLengthMin: number;
 
 	@Prop({ type: Number })
-	fwd_pkt_len_mean: number;
+	fwdPacketLengthMean: number;
 
 	@Prop({ type: Number })
-	fwd_pkt_len_std: number;
+	fwdPacketLengthStd: number;
 
 	@Prop({ type: Number })
-	bwd_pkt_len_max: number;
+	bwdPacketLengthMax: number;
 
 	@Prop({ type: Number })
-	bwd_pkt_len_min: number;
+	bwdPacketLengthMin: number;
 
 	@Prop({ type: Number })
-	bwd_pkt_len_mean: number;
+	bwdPacketLengthMean: number;
 
 	@Prop({ type: Number })
-	bwd_pkt_len_std: number;
+	bwdPacketLengthStd: number;
 
 	@Prop({ type: Number })
-	pkt_len_max: number;
+	packetLengthMax: number;
 
 	@Prop({ type: Number })
-	pkt_len_min: number;
+	packetLengthMin: number;
 
 	@Prop({ type: Number })
-	pkt_len_mean: number;
+	packetLengthMean: number;
 
 	@Prop({ type: Number })
-	pkt_len_std: number;
+	packetLengthStd: number;
 
 	@Prop({ type: Number })
-	pkt_len_var: number;
+	packetLengthVariance: number;
 
 	@Prop({ type: Number })
-	fwd_header_len: number;
+	fwdHeaderLength: number;
 
 	@Prop({ type: Number })
-	bwd_header_len: number;
+	bwdHeaderLength: number;
 
 	@Prop({ type: Number })
-	fwd_seg_size_min: number;
+	fwdSegSizeMin: number;
 
 	@Prop({ type: Number })
-	fwd_seg_size_avg: number;
+	avgFwdSegmentSize: number;
 
 	@Prop({ type: Number })
-	bwd_seg_size_avg: number;
+	avgBwdSegmentSize: number;
 
 	@Prop({ type: Number })
-	fwd_act_data_pkts: number;
+	fwdActDataPackets: number;
 
 	@Prop({ type: Number })
-	flow_iat_mean: number;
+	flowIatMean: number;
 
 	@Prop({ type: Number })
-	flow_iat_max: number;
+	flowIatMax: number;
 
 	@Prop({ type: Number })
-	flow_iat_min: number;
+	flowIatMin: number;
 
 	@Prop({ type: Number })
-	flow_iat_std: number;
+	flowIatStd: number;
 
 	@Prop({ type: Number })
-	fwd_iat_tot: number;
+	fwdIatTotal: number;
 
 	@Prop({ type: Number })
-	fwd_iat_max: number;
+	fwdIatMax: number;
 
 	@Prop({ type: Number })
-	fwd_iat_min: number;
+	fwdIatMin: number;
 
 	@Prop({ type: Number })
-	fwd_iat_mean: number;
+	fwdIatMean: number;
 
 	@Prop({ type: Number })
-	fwd_iat_std: number;
+	fwdIatStd: number;
 
 	@Prop({ type: Number })
-	bwd_iat_tot: number;
+	bwdIatTotal: number;
 
 	@Prop({ type: Number })
-	bwd_iat_max: number;
+	bwdIatMax: number;
 
 	@Prop({ type: Number })
-	bwd_iat_min: number;
+	bwdIatMin: number;
 
 	@Prop({ type: Number })
-	bwd_iat_mean: number;
+	bwdIatMean: number;
 
 	@Prop({ type: Number })
-	bwd_iat_std: number;
+	bwdIatStd: number;
 
 	@Prop({ type: Number })
-	fwd_psh_flags: number;
+	fwdPshFlags: number;
 
 	@Prop({ type: Number })
-	bwd_psh_flags: number;
+	bwdPshFlags: number;
 
 	@Prop({ type: Number })
-	fwd_urg_flags: number;
+	fwdUrgFlags: number;
 
 	@Prop({ type: Number })
-	bwd_urg_flags: number;
+	bwdUrgFlags: number;
 
 	@Prop({ type: Number })
-	fin_flag_cnt: number;
+	finFlagCount: number;
 
 	@Prop({ type: Number })
-	syn_flag_cnt: number;
+	synFlagCount: number;
 
 	@Prop({ type: Number })
-	rst_flag_cnt: number;
+	rstFlagCount: number;
 
 	@Prop({ type: Number })
-	psh_flag_cnt: number;
+	pshFlagCount: number;
 
 	@Prop({ type: Number })
-	ack_flag_cnt: number;
+	ackFlagCount: number;
 
 	@Prop({ type: Number })
-	urg_flag_cnt: number;
+	urgFlagCount: number;
 
 	@Prop({ type: Number })
-	cwr_flag_cnt: number;
+	cweFlagCount: number;
 
 	@Prop({ type: Number })
-	ece_flag_cnt: number;
+	eceFlagCount: number;
 
 	@Prop({ type: Number })
-	down_up_ratio: number;
+	downUpRatio: number;
 
 	@Prop({ type: Number })
-	pkt_size_avg: number;
+	avgPacketSize: number;
 
 	@Prop({ type: Number })
-	init_fwd_win_byts: number;
+	initFwdWinBytes: number;
 
 	@Prop({ type: Number })
-	init_bwd_win_byts: number;
+	initBwdWinBytes: number;
 
 	@Prop({ type: Number })
 	win_byts_tot: number;
@@ -248,57 +239,62 @@ export class Traffic {
 	zero_win_cnt: number;
 
 	@Prop({ type: Number })
-	active_max: number;
+	activeMax: number;
 
 	@Prop({ type: Number })
-	active_min: number;
+	activeMin: number;
 
 	@Prop({ type: Number })
-	active_mean: number;
+	activeMean: number;
 
 	@Prop({ type: Number })
-	active_std: number;
+	activeStd: number;
 
 	@Prop({ type: Number })
-	idle_max: number;
+	idleMax: number;
 
 	@Prop({ type: Number })
-	idle_min: number;
+	idleMin: number;
 
 	@Prop({ type: Number })
-	idle_mean: number;
+	idleMean: number;
 
 	@Prop({ type: Number })
-	idle_std: number;
+	idleStd: number;
 
 	@Prop({ type: Number })
-	subflow_fwd_pkts: number;
+	subflowFwdPackets: number;
 
 	@Prop({ type: Number })
-	subflow_bwd_pkts: number;
+	subflowBwdPackets: number;
 
 	@Prop({ type: Number })
-	subflow_fwd_byts: number;
+	subflowFwdBytes: number;
 
 	@Prop({ type: Number })
-	subflow_bwd_byts: number;
+	subflowBwdBytes: number;
 
 	@Prop({ type: Number })
-	fwd_byts_b_avg: number;
+	fwdAvgBytesPerBulk: number;
 
 	@Prop({ type: Number })
-	fwd_pkts_b_avg: number;
+	fwdAvgPacketsPerBulk: number;
 
 	@Prop({ type: Number })
-	bwd_byts_b_avg: number;
+	bwdAvgBytesPerBulk: number;
 
 	@Prop({ type: Number })
-	bwd_pkts_b_avg: number;
+	bwdAvgPacketsPerBulk: number;
+
+	@Prop({ type: Number })
+	fwdAvgBulkRate: number;
+
+	@Prop({ type: Number })
+	bwdAvgBulkRate: number;
 
 	@Prop({ type: String, enum: PredictionResult })
-	predictionResult: PredictionResult;
+	predict: PredictionResult;
 }
-
 
 export type TrafficDocument = HydratedDocument<Traffic>;
 export const TrafficSchema = SchemaFactory.createForClass(Traffic);

@@ -1,4 +1,6 @@
 export enum PredictionResult {
 	Benign = 'Benign',
-	Malicious = 'Malicious',
+	LDAP = 'LDAP',
+	UDP = 'UDP',
+	Syn = 'Syn',
 }
