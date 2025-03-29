@@ -13,113 +13,84 @@ import torch.nn as nn
 class Resnet50Prediction:
 
     def __init__(self, *args, **kwargs):
+        self.selected_columns = ['Protocol', 'Flow Duration', 'Total Fwd Packets', 'Total Backward Packets', 
+                    'Fwd Packets Length Total', 'Fwd Packet Length Max', 'Fwd Packet Length Min', 
+                    'Fwd Packet Length Std', 'Bwd Packet Length Max', 'Bwd Packet Length Min', 
+                    'Bwd Packet Length Mean', 'Flow Bytes/s', 'Flow Packets/s', 'Flow IAT Mean', 
+                    'Flow IAT Max', 'Flow IAT Min', 'Bwd IAT Total', 'Bwd IAT Mean', 'Bwd IAT Min', 
+                    'Fwd PSH Flags', 'Bwd PSH Flags', 'Fwd URG Flags', 'Bwd URG Flags', 'Fwd Header Length', 
+                    'Bwd Header Length', 'Bwd Packets/s', 'Packet Length Max', 'FIN Flag Count', 'SYN Flag Count', 
+                    'PSH Flag Count', 'ACK Flag Count', 'URG Flag Count', 'CWE Flag Count', 'ECE Flag Count', 'Down/Up Ratio', 
+                    'Fwd Avg Bytes/Bulk', 'Fwd Avg Packets/Bulk', 'Fwd Avg Bulk Rate', 'Bwd Avg Bytes/Bulk', 
+                    'Bwd Avg Packets/Bulk', 'Bwd Avg Bulk Rate', 'Init Fwd Win Bytes', 'Init Bwd Win Bytes', 
+                    'Fwd Seg Size Min', 'Active Mean', 'Active Std', 'Active Max', 'Active Min', 'Idle Std']
         
-        (self.mean, self.std) = self.load_train_stats()
-        # self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.device = torch.device("cpu")
-        self.labels = ['BENIGN', 'LDAP', 'MSSQL', 'Portmap', 'Syn', 'UDP', 'UDPLag']
-        self.selected_columns = ['Total Fwd Packets', 'Total Backward Packets',
-                                'Fwd Packets Length Total', 'Bwd Packets Length Total',
-                                'Fwd Packet Length Max', 'Fwd Packet Length Min',
-                                'Fwd Packet Length Mean', 'Fwd Packet Length Std',
-                                'Bwd Packet Length Max', 'Bwd Packet Length Min',
-                                'Bwd Packet Length Mean', 'Bwd Packet Length Std', 'Flow Bytes/s',
-                                'Flow Packets/s', 'Flow IAT Mean', 'Flow IAT Std', 'Flow IAT Max',
-                                'Flow IAT Min', 'Fwd IAT Total', 'Fwd IAT Mean', 'Fwd IAT Std',
-                                'Fwd IAT Max', 'Fwd IAT Min', 'Bwd IAT Total', 'Bwd IAT Mean',
-                                'Bwd IAT Std', 'Bwd IAT Max', 'Bwd IAT Min', 'Fwd PSH Flags',
-                                'Bwd PSH Flags', 'Fwd URG Flags', 'Bwd URG Flags', 'Fwd Header Length',
-                                'Bwd Header Length',
-                                'Packet Length Min', 'Packet Length Max', 'Packet Length Mean',
-                                'Packet Length Std', 'Packet Length Variance', 
-                                'CWE Flag Count', 'ECE Flag Count',
-                                'Avg Packet Size', 'Avg Fwd Segment Size', 'Avg Bwd Segment Size',
-                                'Fwd Avg Bytes/Bulk', 'Fwd Avg Packets/Bulk', 
-                                'Bwd Avg Bytes/Bulk', 'Bwd Avg Packets/Bulk', 
-                                'Subflow Fwd Packets', 'Subflow Fwd Bytes', 'Subflow Bwd Packets',
-                                'Subflow Bwd Bytes', 'Init Fwd Win Bytes', 'Init Bwd Win Bytes',
-                                'Fwd Act Data Packets', 'Fwd Seg Size Min', 'Active Mean', 'Active Std',
-                                'Active Max', 'Active Min', 'Idle Mean', 'Idle Std', 'Idle Max',
-                                'Idle Min',]
-        self.model = self.load_model()
+        # Load precomputed MinMaxScaler and grid positions
+        self.scaler_path = "scaler/scaler.pkl"
+        self.grid_posisitions_path = "scaler/grid_positions.npy"
 
-    def load_model(self):
-        model_path = 'models/resnet50_finetuned.pth'
+        self.scaler = joblib.load(self.scaler_path)
+        self.grid_positions = np.load(self.grid_posisitions_path)
 
-        """ Load ResNet50 model """
-        model = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V1)
-        num_ftrs = model.fc.in_features
-        model.fc = nn.Linear(num_ftrs, len(self.labels))  # Adjust output layer
-        model = model.to(self.device)
-        model.load_state_dict(torch.load(model_path, map_location=self.device))
-        model.eval()
-        return model
-
-    def load_train_stats(self):
-        ## Load min và max từ file
-        with open("scaler/train_min_max.json", "r") as f:
-            data = json.load(f)
-
-        mean = pd.Series(data["mean"])
-        std = pd.Series(data["std"])
-        return mean, std
-
-    def normalize(self, df):
-        data = df.copy()
-        data.replace([-np.inf, np.inf], 0, inplace=True)
-        data.fillna(self.mean, inplace=True)
-
-        self.std.replace(0, 1, inplace=True) # 
-
-        data = (data - self.mean) / self.std
-
-        data.fillna(0, inplace=True)
-
-        data_df = np.log1p(data + 1)
-        data_scaled = pd.DataFrame(MinMaxScaler(feature_range=(0, 255)).fit_transform(data_df).astype(np.uint8))
-
-        return data_scaled
-
-    def data_to_image(self, data):
-        image_size = (8, 8)
-        upscale_factor = 28
-
-        for row in data.values:
-            # Chuyển đổi dòng thành ma trận ảnh ban đầu (8x8)
-            image_array = np.array(row).reshape(image_size)
-            image_array = np.nan_to_num(image_array, nan=0.0, posinf=1.0, neginf=0.0)  # Thay thế giá trị NaN bằng 0
-
-            # Phóng to mỗi pixel np.kron()
-            upscale_matrix = np.ones((upscale_factor, upscale_factor))
-            enlarged_image_array = np.kron(image_array, upscale_matrix)
-
-            # Chuyển đổi sang ảnh
-            image = Image.fromarray((enlarged_image_array * 255).astype(np.uint8))  # Chuyển sang RGB
-            image = image.convert("RGB")
-
-            # image.save('data/test/haa/r2.png')
-        
-        return image
-
-    def predict(self, df):
-        data = df[self.selected_columns]
-        data_normalize = self.normalize(data)
-        img = self.data_to_image(data_normalize)
-
-        transform = transforms.Compose([
-            transforms.ToPILImage(),
-            transforms.Resize((224, 224)),  
+        # Define image transformations
+        self.transform = transforms.Compose([
+            transforms.Resize((224, 224)),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ])
 
-        if isinstance(img, Image.Image):  # If img is PIL Image, convert to Tensor
-            img = F.to_tensor(img)
-       
-        img_tensor = transform(img).unsqueeze(0).to(self.device)
-        img_tensor = transform(img).unsqueeze(0)
-        with torch.no_grad():
-            output = self.model(img_tensor)
-        predicted_class = torch.argmax(output, dim=1).item()
+        self.label_map = ['BENIGN', 'Group1', 'Group2', 'Syn']
 
-        return self.labels[predicted_class]
+        # Kiểm tra thiết bị (GPU nếu có)
+        # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cpu")
+        
+        self.model = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V1)
+        self.num_ftrs = self.model.fc.in_features
+        self.model.fc = nn.Linear(self.num_ftrs, len(self.label_map))  # Adjust output layer
+        self.model = self.model.to(self.device)
+        self.model.load_state_dict(torch.load("models/resnet50_finetuned.pth",  map_location=self.device))
+        self.model.eval()
+    
+    def prepare_data(self, dff: pd.DataFrame):
+        df = dff.copy()
+        df.replace([-np.inf, np.inf], 0, inplace=True)
+        df.fillna(0, inplace=True)
+        df = np.log1p(df + 1)
+        df.replace([-np.inf, np.inf], 0, inplace=True)
+        df.fillna(0, inplace=True)
+        features = self.scaler.transform(df.values)  # Chuẩn hóa bằng scaler đã huấn luyện
+        return features
+    
+    def process_row_to_image(self, row, grid_size=7, image_size=224):
+        grid = np.zeros((grid_size, grid_size), dtype=float)
+        count = np.zeros((grid_size, grid_size), dtype=int)
+        
+        for i in range(len(row)):
+            x, y = self.grid_positions[i]
+            grid[x, y] += row[i]
+            count[x, y] += 1
+        
+        nonzero = count > 0
+        grid[nonzero] = grid[nonzero] / count[nonzero]
+        grid_norm = ((grid - grid.min()) / (grid.max() - grid.min() + 1e-8)) * 255
+        
+        upscale_factor = image_size // grid_size
+        expanded_image = np.kron(grid_norm, np.ones((upscale_factor, upscale_factor)))
+        img = Image.fromarray(expanded_image.astype(np.uint8), mode='L').convert("RGB")
+        img = img.resize((image_size, image_size))
+        return img
+    
+    def predict(self, df: pd.DataFrame):
+        row_df = df[self.selected_columns]
+        features = self.prepare_data(row_df)  # Đưa vào dạng array
+        image = self.process_row_to_image(features[0])  # Chuyển thành ảnh
+
+        # Áp dụng transform để phù hợp với mô hình
+        input_tensor = self.transform(image).unsqueeze(0)  # Thêm batch dimension
+        
+        with torch.no_grad():
+            output = self.model(input_tensor)
+        predicted_class = torch.argmax(output, dim=1).item()
+        return self.label_map[predicted_class]
+        

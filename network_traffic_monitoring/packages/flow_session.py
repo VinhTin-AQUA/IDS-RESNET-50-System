@@ -1,23 +1,18 @@
 import csv
 from collections import defaultdict
-
-import requests
 from scapy.sessions import DefaultSession
-
 from . import constants
 from .features.context.packet_direction import PacketDirection
 from .features.context.packet_flow_key import get_packet_flow_key
 from .flow import Flow
-from pandas.core.frame import DataFrame
 import os
-import pickle
-import sys
-import threading
 import time
-from datetime import datetime
+import json
+from packages.kafka_service.producer import KafkaProducer
+from packages.shared.shared_data import SharedState
 
 GARBAGE_COLLECT_PACKETS = 10000
-
+NUMBER_OF_FLOWS = 10
 
 class FlowSession(DefaultSession):
     """Creates a list of network flows."""
@@ -26,9 +21,11 @@ class FlowSession(DefaultSession):
         self.flows = {}
         self.ip_list = {}
         self.curr_timestamp = time.time()
-
+     
         self.packets_count = 0
         self.clumped_flows_per_label = defaultdict(list)
+        self.producer = KafkaProducer()
+        self.kafka_state = SharedState()
         super(FlowSession, self).__init__(*args, **kwargs)
     
     def toPacketList(self):
@@ -41,9 +38,7 @@ class FlowSession(DefaultSession):
         print("\033[31mFinish!\033[0m")
         return super(FlowSession, self).toPacketList()
 
-
     def on_packet_received(self, packet):
-        count = 0
         direction = PacketDirection.FORWARD
         proto = None
         if "TCP" in packet:
@@ -72,7 +67,15 @@ class FlowSession(DefaultSession):
                 direction = PacketDirection.FORWARD
                 flow = Flow(packet, direction)
                 packet_flow_key = get_packet_flow_key(packet, direction)
-                self.flows[packet_flow_key] = flow
+                
+                if self.kafka_state.enable_producer == True and self.kafka_state.current_number_of_flow_in_flow_topic <= NUMBER_OF_FLOWS:
+                    self.flows[packet_flow_key] = flow
+                    self.kafka_state.increase_flow()
+                
+                    if self.kafka_state.current_number_of_flow_in_flow_topic >= NUMBER_OF_FLOWS:
+                        self.kafka_state.update_producer(False)
+                        print(self.kafka_state.enable_producer)
+                    
         
         if proto == "TCP" and ("F" in str(packet["TCP"].flags)):
             if direction == PacketDirection.FORWARD:
@@ -104,7 +107,6 @@ class FlowSession(DefaultSession):
         #     self.curr_timestamp = packet.time
 
         if (packet.time - self.curr_timestamp) >= constants.FLOW_TIMEOUT:
-            print(12)
             self.garbage_collect(packet.time)
             self.curr_timestamp = packet.time
 
@@ -235,7 +237,6 @@ class FlowSession(DefaultSession):
                             direction = [ pkt[1] for pkt in perflow.packets]                                    
                             if (len(perflow.packets) >= constants.MIN_PACKAGE_COUNT_PERFLOW):
                                 data = perflow.get_data()
-                        
                                 self.handle_flow(data)
                             
                                 del data
@@ -243,7 +244,6 @@ class FlowSession(DefaultSession):
                             del self.flows[k]
                             del perflow      
 
-        
     def save_csv(self, data):
         file_exists = os.path.exists(self.output_file) and os.stat(self.output_file).st_size > 0
 
@@ -260,13 +260,12 @@ class FlowSession(DefaultSession):
 
     def handle_flow(self, data):
         data['Label'] = 'Syn'
-        # data['Predict'] = 'Unknow'
-        # if data['Dest Post'] == 80:
-        
-        self.save_csv(data)
+        data['Predict'] = 'Unknow'
 
-        # value_json = json.dumps(data).encode('utf-8')
-        # self.producer.send_message('flow', value_json)
+        # if data['Dest Post'] == 80:
+        # self.save_csv(data)
+        value_json = json.dumps(data).encode('utf-8')
+        self.producer.send_message('flow', value_json)
 
 
 def generate_session_class(output_file):
