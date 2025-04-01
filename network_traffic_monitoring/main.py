@@ -23,14 +23,11 @@ def timelimit(sniffer, session_instance):
         session_instance.toPacketList()
     print("\033[31mReached the time limit!\033[0m")
 
-def get_flows():
+def get_flows(session_instance, NewFlowSession):
     input_interface = 'ens33' # network adapter
-    output_file = 'data/csv/realtime_flow.csv' # path to save csv file
+    
     # limit = 120 # second
     limit = None # unlimit
-
-    NewFlowSession = generate_session_class(output_file)
-    session_instance = NewFlowSession()
 
     sniffer = create_sniffer(
         input_interface,
@@ -70,17 +67,25 @@ def predict_and_send_result():
     consumer = KafkaConsumer()
     consumer.consume_messages()
 
+def run_statistics(session_instance):
+    session_instance.statistics()
+
 def main():
+    output_file = 'data/csv/realtime_flow.csv' # path to save csv file
+    NewFlowSession = generate_session_class(output_file)
+    session_instance = NewFlowSession()
 
-    get_flows_thread = threading.Thread(target=get_flows, daemon=True) 
-    predict_thread = threading.Thread(target=predict_and_send_result, daemon=True)
-
-    get_flows_thread.start()
-    predict_thread.start()
-
+    get_flows_thread = threading.Thread(target=get_flows,args=(session_instance,NewFlowSession,), daemon=True) 
+    # predict_thread = threading.Thread(target=predict_and_send_result, daemon=True)
+    periodic_thread = threading.Thread(target=run_statistics, args=(session_instance,), daemon=True)
     
+    get_flows_thread.start()
+    # predict_thread.start()
+    periodic_thread.start()
+
     get_flows_thread.join()
-    predict_thread.join()
+    # predict_thread.join()
+    periodic_thread.join()
 
 
 if __name__ == "__main__":

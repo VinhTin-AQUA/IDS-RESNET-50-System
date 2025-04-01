@@ -5,7 +5,7 @@ import requests
 from pandas.core.frame import DataFrame
 from ..prediction.resnet50_prediction import Resnet50Prediction
 import urllib3
-from packages.shared.shared_data import SharedState
+from packages.shared.shared_data import SharedState, SharedApi
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) # loai bo canh bao goi api co SSL khong hop le
 
 
@@ -16,6 +16,7 @@ class KafkaConsumer:
         self.consumer.subscribe([TOPIC_NAME])
         self.model = Resnet50Prediction()
         self.kafka_state = SharedState()
+        self.shared_api = SharedApi()
 
     def consume_messages(self):
         session = requests.Session()
@@ -40,14 +41,13 @@ class KafkaConsumer:
                     self.kafka_state.update_producer(True)
                     
                 
-                # url = "http://bf81-113-161-36-23.ngrok-free.app"  # API giả lập
                 # headers = {"Content-Type": "application/json"}
                 
                 # payload = {
                 #     "data": message_dict
                 # }
 
-                # response = session.post(url + '/tracking/send', json=payload, headers=headers, verify=False)
+                # response = session.post(self.shared_api.api_base + '/tracking/send', json=payload, headers=headers, verify=False)
 
                 # if response.status_code == 200 or response.status_code == 201:  # Kiểm tra nếu request thành công
                 #     # data = response.json()  # Chuyển đổi dữ liệu JSON thành dict

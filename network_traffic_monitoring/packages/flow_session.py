@@ -9,7 +9,11 @@ import os
 import time
 import json
 from packages.kafka_service.producer import KafkaProducer
-from packages.shared.shared_data import SharedState
+from packages.shared.shared_data import SharedState, SharedApi
+from collections import defaultdict
+from datetime import datetime, timezone
+import threading
+import requests
 
 GARBAGE_COLLECT_PACKETS = 10000
 NUMBER_OF_FLOWS = 10
@@ -23,9 +27,13 @@ class FlowSession(DefaultSession):
         self.curr_timestamp = time.time()
      
         self.packets_count = 0
-        self.clumped_flows_per_label = defaultdict(list)
-        self.producer = KafkaProducer()
+        # self.producer = KafkaProducer()
         self.kafka_state = SharedState()
+        self.shared_api = SharedApi()
+
+        self.packet_traffic = defaultdict(int)
+        self.packet_sizes = 0
+        self.lock = threading.Lock()
         super(FlowSession, self).__init__(*args, **kwargs)
     
     def toPacketList(self):
@@ -39,12 +47,21 @@ class FlowSession(DefaultSession):
         return super(FlowSession, self).toPacketList()
 
     def on_packet_received(self, packet):
+        
         direction = PacketDirection.FORWARD
         proto = None
         if "TCP" in packet:
             proto = "TCP"
         elif "UDP" in packet:
             proto = "UDP"
+
+        with self.lock:
+            self.packet_traffic[proto] += 1
+
+            if packet.haslayer("Raw"):  # Kiểm tra nếu gói tin có chứa payload
+                raw_data = packet["Raw"].load  # Lấy phần dữ liệu của gói tin
+                size_mb = len(raw_data) / (1024)  # Chuyển đổi sang MB
+                self.packet_sizes += size_mb
 
         try:
             # Creates a key variable to check
@@ -73,7 +90,7 @@ class FlowSession(DefaultSession):
                     self.kafka_state.increase_flow()
                 
                     if self.kafka_state.current_number_of_flow_in_flow_topic >= NUMBER_OF_FLOWS:
-                        self.kafka_state.update_producer(False)
+                        self.kafka_state.update_enable_producer(False)
                         print(self.kafka_state.enable_producer)
                     
         
@@ -112,7 +129,41 @@ class FlowSession(DefaultSession):
 
         del flow
         del packet
-        #print(self.packets_count)
+        # print(self.packets_count)
+
+    def statistics(self):
+        session = requests.Session()
+        while True:
+            time.sleep(1)
+            with self.lock:
+               
+                total_packets = sum(self.packet_traffic.values())
+                if total_packets == 0:
+                    continue  # Không có dữ liệu để gửi
+                
+                timestamp = datetime.now(timezone.utc).strftime("%Y/%m/%d %H:%M:%S")
+                pie_chart_data = [
+                    {"name": proto, "value": count} for proto, count in self.packet_traffic.items()
+                ]
+                payload = {
+                    "trafficLineChart": {
+                        "name": datetime.now(timezone.utc).ctime(),
+                        "value": [timestamp, self.packet_sizes]
+                    },
+                    "trafficPieChart": pie_chart_data
+                }
+
+                # Reset dữ liệu sau mỗi lần gửi
+                self.packet_traffic.clear()
+                self.packet_sizes = 0
+                headers = {"Content-Type": "application/json"}
+            try:
+                response = session.post(f"{self.shared_api.api_base}/tracking/traffic-tracking", json=payload, headers=headers, verify=False)
+
+                # print(payload)
+                # print(response.status_code)
+            except requests.exceptions.RequestException as e:
+                print("Error sending data:", e)
 
     def get_flows(self) -> list:
         return self.flows.values()
@@ -263,9 +314,9 @@ class FlowSession(DefaultSession):
         data['Predict'] = 'Unknow'
 
         # if data['Dest Post'] == 80:
-        # self.save_csv(data)
-        value_json = json.dumps(data).encode('utf-8')
-        self.producer.send_message('flow', value_json)
+        self.save_csv(data)
+        # value_json = json.dumps(data).encode('utf-8')
+        # self.producer.send_message('flow', value_json)
 
 
 def generate_session_class(output_file):
