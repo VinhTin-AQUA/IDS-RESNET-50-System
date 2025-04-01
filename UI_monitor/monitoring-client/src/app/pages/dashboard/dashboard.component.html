@@ -1,9 +1,28 @@
 <div class=" p-4">
 	<div>
 
-        <!-- action -->
-        <div>
-            <button>ADD</button>
+        <!-- chart -->
+        <div class="flex gap-4 items-center">
+            <div class="traffic-piechart-container ">
+                <ngx-echarts
+                    [autoResize]="true"
+                    echarts
+                    [options]="trafficPieChartoptions"
+                    [merge]="updateTrafficPieChartOptions"
+                    class="traffic-piechart"
+                ></ngx-echarts>
+            </div>
+
+            <div class="traffic-linechart-container flex-1">
+                <ngx-echarts
+                    [autoResize]="true"
+                    echarts
+                    [options]="trafficLineChartoptions"
+                    [merge]="updateTrafficLineChartOptions"
+                    class="traffic-linechart"
+                ></ngx-echarts>
+            </div>
+
         </div>
 
         <!-- table -->
@@ -13,7 +32,7 @@
 			>
 				<thead class="text-xs text-gray-700 uppercase bg-gray-50">
 					<tr>
-						<th scope="col" class="px-6 py-3">src_ip</th>
+						<!-- <th scope="col" class="px-6 py-3">src_ip</th> -->
 						<th scope="col" class="px-6 py-3">dst_ip</th>
 						<th scope="col" class="px-6 py-3">src_port</th>
 						<th scope="col" class="px-6 py-3">dst_port</th>
@@ -26,12 +45,12 @@
 				<tbody>
 					@for (item of flowTemps; track $index) {
 					<tr class="bg-white border-b border-gray-200">
-						<th
+						<!-- <th
 							scope="row"
 							class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
 						>
 							{{ item.src_ip }}
-						</th>
+						</th> -->
 						<td class="px-6 py-4">
 							{{ item.dst_ip }}
 						</td>

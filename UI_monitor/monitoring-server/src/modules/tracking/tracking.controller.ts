@@ -1,7 +1,8 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { TrackingGateway } from './tracking.gateway';
-import { FlowDto } from './dto/flow.dto';
+import { FlowTrackingDto } from './dto/flow-tracking.dto';
 import { TrafficService } from '../traffic/traffic.service';
+import { TrafficTrackingDto } from './dto/traffic-tracking.dto';
 
 @Controller('tracking')
 export class TrackingController {
@@ -10,9 +11,9 @@ export class TrackingController {
 		private trafficSevice: TrafficService
 	) {}
 
-	@Post('send')
-	async sendMessageToClients(@Body() body: FlowDto) {
-		this.trackingGateway.sendMessageToClients(body);
+	@Post('flow-tracking')
+	async sendFlowTrackingClients(@Body() body: FlowTrackingDto) {
+		this.trackingGateway.sendFlowTrackingMessageToClient(body);
 
 		const traffic = {
 			destPost: body.data['Dest Post'],
@@ -114,7 +115,12 @@ export class TrackingController {
 		};
 
         await this.trafficSevice.addTraffic(traffic)
-
 		return { success: true, message: 'Message sent to all clients' };
 	}
+
+    @Post('traffic-tracking')
+    sendTrafficTrackingToClients(@Body() body: TrafficTrackingDto) {
+        this.trackingGateway.sendTrafficTrackingMessageToClient(body);
+        return body;
+    }
 }

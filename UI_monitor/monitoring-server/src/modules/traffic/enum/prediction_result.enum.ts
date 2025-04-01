@@ -1,5 +1,5 @@
 export enum PredictionResult {
-	Benign = 'Benign',
+	Benign = 'BENIGN',
 	LDAP = 'LDAP',
 	UDP = 'UDP',
 	Syn = 'Syn',

@@ -11,10 +11,7 @@ import { TrafficService } from '../traffic/traffic.service';
 	},
 })
 export class TrackingGateway {
-	z;
-	constructor(
-		private readonly trackingService: TrackingService,
-	) {}
+	constructor(private readonly trackingService: TrackingService) {}
 
 	private server: Server;
 
@@ -34,14 +31,27 @@ export class TrackingGateway {
 		console.log(`Client disconnected: ${client.id}`);
 	}
 
+	/* flow-tracking */
 	// lắng nghe messge từ client
-	@SubscribeMessage('events')
-	handleEvent(@MessageBody() data: string) {
+	@SubscribeMessage('flow-tracking')
+	handleFlowTrackingMessage(@MessageBody() data: string) {
 		console.log(data);
 	}
 
 	// Hàm gửi message từ server đến tất cả client
-	sendMessageToClients(body: any) {
-		this.server.emit('events', body);
+	sendFlowTrackingMessageToClient(body: any) {
+		this.server.emit('flow-tracking', body);
+	}
+
+	/* traffic tracking */
+	// lắng nghe messge từ client
+	@SubscribeMessage('traffic-tracking')
+	handleTrafficTrackingMessage(@MessageBody() data: string) {
+		console.log(data);
+	}
+
+	// Hàm gửi message từ server đến tất cả client
+	sendTrafficTrackingMessageToClient(body: any) {
+		this.server.emit('traffic-tracking', body);
 	}
 }
