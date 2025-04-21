@@ -27,7 +27,7 @@ class FlowSession(DefaultSession):
         self.curr_timestamp = time.time()
      
         self.packets_count = 0
-        # self.producer = KafkaProducer()
+        self.producer = KafkaProducer()
         self.kafka_state = SharedState()
         self.shared_api = SharedApi()
 

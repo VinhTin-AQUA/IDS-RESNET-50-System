@@ -20,7 +20,7 @@ class KafkaConsumer:
 
     def consume_messages(self):
         session = requests.Session()
-
+        i = 1
         while True:
             msg = self.consumer.poll(1.0)
             if msg is None:
@@ -35,10 +35,11 @@ class KafkaConsumer:
                 predict_label = self.model.predict(df)
                 message_dict['Predict'] = predict_label
 
-                print(message_dict['Predict'])
+                print(f"{i} : {message_dict['Predict']}")
+                i += 1
                 self.kafka_state.decrease_flow()
                 if self.kafka_state.current_number_of_flow_in_flow_topic <= 0:
-                    self.kafka_state.update_producer(True)
+                    self.kafka_state.update_enable_producer(True)
                     
                 
                 # headers = {"Content-Type": "application/json"}

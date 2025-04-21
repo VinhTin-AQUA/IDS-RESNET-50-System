@@ -77,15 +77,15 @@ def main():
 
     get_flows_thread = threading.Thread(target=get_flows,args=(session_instance,NewFlowSession,), daemon=True) 
     # predict_thread = threading.Thread(target=predict_and_send_result, daemon=True)
-    periodic_thread = threading.Thread(target=run_statistics, args=(session_instance,), daemon=True)
+    # stat_thread = threading.Thread(target=run_statistics, args=(session_instance,), daemon=True)
     
     get_flows_thread.start()
     # predict_thread.start()
-    periodic_thread.start()
+    # stat_thread.start()
 
     get_flows_thread.join()
     # predict_thread.join()
-    periodic_thread.join()
+    # stat_thread.join()
 
 
 if __name__ == "__main__":
