@@ -5,8 +5,5 @@ scikit-learn
 pandas
 numpy
 requests
-# urllib3
 confluent-kafka
-# torch
-# torchvision
-# opencv-python
+tab2img
