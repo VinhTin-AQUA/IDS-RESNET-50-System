@@ -22,13 +22,14 @@ class KafkaConsumer:
         session = requests.Session()
         i = 1
         while True:
+            
             msg = self.consumer.poll(1.0)
             if msg is None:
                 continue
             if msg.error():
                 print(f'Error: {msg.error()}')
             else:
-
+                print("aa")
                 message_dict = json.loads(msg.value().decode('utf-8'))
                 df = DataFrame([message_dict])
 
@@ -42,20 +43,20 @@ class KafkaConsumer:
                     self.kafka_state.update_enable_producer(True)
                     
                 
-                # headers = {"Content-Type": "application/json"}
+                headers = {"Content-Type": "application/json"}
                 
-                # payload = {
-                #     "data": message_dict
-                # }
+                payload = {
+                    "data": message_dict
+                }
 
-                # response = session.post(self.shared_api.api_base + '/tracking/send', json=payload, headers=headers, verify=False)
+                response = session.post(self.shared_api.api_base + '/tracking/flow-tracking', json=payload, headers=headers, verify=False)
 
-                # if response.status_code == 200 or response.status_code == 201:  # Kiểm tra nếu request thành công
-                #     # data = response.json()  # Chuyển đổi dữ liệu JSON thành dict
-                #     # print(data)
-                #     print("gui thanh cong")
-                #     pass
-                # else:
-                #     print(f"Lỗi {response.status_code}")
+                if response.status_code == 200 or response.status_code == 201:  # Kiểm tra nếu request thành công
+                    # data = response.json()  # Chuyển đổi dữ liệu JSON thành dict
+                    # print(data)
+                    # print("gui thanh cong")
+                    pass
+                else:
+                    print(f"Lỗi {response.status_code}")
                 
                 

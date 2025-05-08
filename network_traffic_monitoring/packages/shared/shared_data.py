@@ -44,6 +44,6 @@ class SharedApi:
         if not hasattr(self, 'lock'):  # Đảm bảo init chỉ chạy 1 lần
             self.lock = threading.Lock()
             
-            self.api_base = 'http://896c-14-161-32-156.ngrok-free.app'
+            self.api_base = 'http://df5f-2401-d800-b4a-768f-d516-483d-de2a-90fd.ngrok-free.app'
 
    

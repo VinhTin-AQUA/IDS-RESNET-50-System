@@ -84,14 +84,16 @@ class FlowSession(DefaultSession):
                 direction = PacketDirection.FORWARD
                 flow = Flow(packet, direction)
                 packet_flow_key = get_packet_flow_key(packet, direction)
-                
+
+                self.flows[packet_flow_key] = flow
+
                 if self.kafka_state.enable_producer == True and self.kafka_state.current_number_of_flow_in_flow_topic <= NUMBER_OF_FLOWS:
                     self.flows[packet_flow_key] = flow
                     self.kafka_state.increase_flow()
                 
-                    if self.kafka_state.current_number_of_flow_in_flow_topic >= NUMBER_OF_FLOWS:
-                        self.kafka_state.update_enable_producer(False)
-                        print(self.kafka_state.enable_producer)
+                if self.kafka_state.current_number_of_flow_in_flow_topic >= NUMBER_OF_FLOWS:
+                    self.kafka_state.update_enable_producer(False)
+                    print(self.kafka_state.enable_producer)
                     
         
         if proto == "TCP" and ("F" in str(packet["TCP"].flags)):
@@ -315,8 +317,8 @@ class FlowSession(DefaultSession):
 
         # if data['Dest Post'] == 80:
         self.save_csv(data)
-        # value_json = json.dumps(data).encode('utf-8')
-        # self.producer.send_message('flow', value_json)
+        value_json = json.dumps(data).encode('utf-8')
+        self.producer.send_message(str(data['Dest Post']), value_json)
 
 
 def generate_session_class(output_file):
