@@ -1,34 +1,5 @@
 import threading
 
-class SharedState:
-    _instance = None
-    _lock = threading.Lock()  # Đảm bảo thread-safe
-
-    def __new__(cls, *args, **kwargs):
-        if not cls._instance:
-            with cls._lock:
-                if not cls._instance:
-                    cls._instance = super().__new__(cls)
-        return cls._instance
-
-    def __init__(self):
-        if not hasattr(self, 'lock'):  # Đảm bảo init chỉ chạy 1 lần
-            self.lock = threading.Lock()
-            self.current_number_of_flow_in_flow_topic = 0
-            self.enable_producer = True
-
-    def increase_flow(self):
-        with self.lock:
-            self.current_number_of_flow_in_flow_topic += 1
-
-    def decrease_flow(self):
-        with self.lock:
-            self.current_number_of_flow_in_flow_topic -= 1
-
-    def update_enable_producer(self, flag: bool):
-        with self.lock:
-            self.enable_producer = flag
-
 class SharedApi:
     _instance = None
     _lock = threading.Lock()  # Đảm bảo thread-safe
@@ -44,6 +15,6 @@ class SharedApi:
         if not hasattr(self, 'lock'):  # Đảm bảo init chỉ chạy 1 lần
             self.lock = threading.Lock()
             
-            self.api_base = 'http://df5f-2401-d800-b4a-768f-d516-483d-de2a-90fd.ngrok-free.app'
+            self.api_base = 'http://e0b7-2401-d800-afb-a79c-2466-93c6-b606-8232.ngrok-free.app'
 
    

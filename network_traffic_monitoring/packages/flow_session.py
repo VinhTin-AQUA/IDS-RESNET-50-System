@@ -8,15 +8,14 @@ from .flow import Flow
 import os
 import time
 import json
-from packages.kafka_service.producer import KafkaProducer
-from packages.shared.shared_data import SharedState, SharedApi
+from packages.shared.shared_data import SharedApi
+from packages.shared.flow_collection import FlowCollection
 from collections import defaultdict
 from datetime import datetime, timezone
 import threading
 import requests
 
 GARBAGE_COLLECT_PACKETS = 10000
-NUMBER_OF_FLOWS = 10
 
 class FlowSession(DefaultSession):
     """Creates a list of network flows."""
@@ -27,9 +26,10 @@ class FlowSession(DefaultSession):
         self.curr_timestamp = time.time()
      
         self.packets_count = 0
-        self.producer = KafkaProducer()
-        self.kafka_state = SharedState()
+        # self.producer = KafkaProducer()
+        # self.kafka_state = SharedState()
         self.shared_api = SharedApi()
+        self.flowCollection = FlowCollection()
 
         self.packet_traffic = defaultdict(int)
         self.packet_sizes = 0
@@ -87,43 +87,13 @@ class FlowSession(DefaultSession):
 
                 self.flows[packet_flow_key] = flow
 
-                if self.kafka_state.enable_producer == True and self.kafka_state.current_number_of_flow_in_flow_topic <= NUMBER_OF_FLOWS:
-                    self.flows[packet_flow_key] = flow
-                    self.kafka_state.increase_flow()
-                
-                if self.kafka_state.current_number_of_flow_in_flow_topic >= NUMBER_OF_FLOWS:
-                    self.kafka_state.update_enable_producer(False)
-                    print(self.kafka_state.enable_producer)
-                    
-        
         if proto == "TCP" and ("F" in str(packet["TCP"].flags)):
             if direction == PacketDirection.FORWARD:
                 flow.fwd_fin += 1
             elif direction == PacketDirection.REVERSE:
                 flow.bwd_fin += 1
 
-
         flow.add_packet(packet, direction)
-
-        # if (packet.time - flow.start_timestamp) > constants.FLOW_TIMEOUT and len(flow.packets) > 0:
-        #     self.garbage_collect(packet.time, packet_flow_key, packet)
-            
-        # else:
-        #     flow.add_packet(packet, direction)
-        #     if proto == "TCP" and (flow.fwd_fin == 1 and flow.bwd_fin == 1):
-        #         self.garbage_collect(packet.time, packet_flow_key)
-
-        #     elif proto == "TCP" and ("R" in str(packet["TCP"].flags)):
-        #         self.garbage_collect(packet.time, packet_flow_key)
-            
-            #elif self.packets_count % GARBAGE_COLLECT_PACKETS == 0:
-            #    self.garbage_collect(packet.time)
-        
-        # if self.packets_count % GARBAGE_COLLECT_PACKETS == 0:
-        #     self.garbage_collect(packet.time)
-        # elif (packet.time - self.curr_timestamp) >= constants.FLOW_TIMEOUT:
-        #     self.garbage_collect(packet.time)
-        #     self.curr_timestamp = packet.time
 
         if (packet.time - self.curr_timestamp) >= constants.FLOW_TIMEOUT:
             self.garbage_collect(packet.time)
@@ -318,7 +288,7 @@ class FlowSession(DefaultSession):
         # if data['Dest Post'] == 80:
         self.save_csv(data)
         value_json = json.dumps(data).encode('utf-8')
-        self.producer.send_message(str(data['Dest Post']), value_json)
+        self.flowCollection.add(value_json)
 
 
 def generate_session_class(output_file):

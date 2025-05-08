@@ -1,11 +1,8 @@
 from torchvision import transforms, models
 import torch
 import joblib  # Để lưu mô hình chuẩn hóa
-from pandas.core.frame import DataFrame
-import json
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import RobustScaler, MinMaxScaler, StandardScaler
 from PIL import Image
 import torchvision.transforms.functional as F
 import torch.nn as nn
@@ -81,6 +78,6 @@ class Resnet50Prediction:
         with torch.no_grad():
             output = self.model(input_tensor)
             predicted_class = torch.argmax(output, dim=1).item()
-        print(predicted_class)
+        # print(predicted_class)
         return self.label_map[predicted_class]
         
