@@ -5,5 +5,4 @@ scikit-learn
 pandas
 numpy
 requests
-confluent-kafka
-tab2img
+pytorch-tabnet

@@ -1,7 +1,7 @@
 import requests
 from pandas.core.frame import DataFrame
 import json
-from ..prediction.resnet50_prediction import Resnet50Prediction
+from ..prediction.tabnet_prediction import TabNetClassifier
 from packages.shared.shared_data import SharedApi
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -14,7 +14,7 @@ class FlowCollection:
             cls._instance = super(FlowCollection, cls).__new__(cls)
             cls._instance._queue = []     # Mảng chứa các đối tượng
             cls._instance._size = 0       # Số lượng đối tượng
-            cls._model = Resnet50Prediction()
+            cls._model = TabNetClassifier()
             cls._share_api = SharedApi()
         return cls._instance
 
