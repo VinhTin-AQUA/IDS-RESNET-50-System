@@ -6,3 +6,8 @@ pandas
 numpy
 requests
 pytorch-tabnet
+
+# python3 -m venv .venv
+# source .venv/bin/activate
+# pip install -r requirements.txt
+# sudo $(which python3) main.py

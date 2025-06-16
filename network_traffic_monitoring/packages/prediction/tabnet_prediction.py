@@ -2,7 +2,7 @@ import joblib  # Để lưu mô hình chuẩn hóa
 import pandas as pd
 from pytorch_tabnet.tab_model import TabNetClassifier
 
-class Resnet50Prediction:
+class TabnetPrediction:
 
     def __init__(self, *args, **kwargs):
         self.selected_columns = ['Flow Duration', 'Total Fwd Packets',
