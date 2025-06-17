@@ -46,15 +46,15 @@ export class DashboardComponent {
 	trafficLineChartoptions!: EChartsCoreOption;
 	updateTrafficLineChartOptions!: EChartsCoreOption;
 	trafficLineChartData: any = [];
-	
+
 	// ==============
 	flowTemps: any = [];
-    maliciousFlows: any = [];
+	maliciousFlows: any = [];
 
 	constructor(private trackingService: TrackingService) {}
 
 	ngOnInit(): void {
-        this.initReceiveTrafficPieChart();
+		this.initReceiveTrafficPieChart();
 		this.initReceiveTrafficLineChart();
 
 		this.onReceiveFlowTable();
@@ -152,19 +152,26 @@ export class DashboardComponent {
 		};
 	}
 
-    private onReceiveFlowTable() {
+	private onReceiveFlowTable() {
 		// Lắng nghe sự kiện 'events' từ server
 		this.trackingService.listen('flow-tracking').subscribe((data: any) => {
 			// console.log('Received message:', data);
 
+			console.log(data);
+
 			const d = {
-                timestamp: data.data['Timestamp'],
-				dst_port: data.data['Dest_Post'],
+				timestamp: data.data['Timestamp'],
+				dst_port: data.data['Dest Post'],
 				protocol: data.data['Protocol'],
-				flowDuration: data.data['Flow_Duration'].toFixed(2),
-				flow_Bytes_s: data.data['Flow_Bytes_s'].toFixed(2),
-				flow_Packets_s: data.data['Flow_Packets_s'].toFixed(2),
-				predict: data.data['Predict'],
+				flowDuration: data.data['Flow Duration'].toFixed(2),
+				flow_Bytes_s: data.data['Flow Bytes/s'].toFixed(2),
+				flow_Packets_s: data.data['Flow Packets/s'].toFixed(2),
+				predict:
+					data.data['Predict'] === 'Group2'
+						? 'UDP'
+						: data.data['Predict'] === 'Group1'
+						? 'Reflection Amplification'
+						: data.data['Predict'],
 			};
 
 			if (this.flowTemps.length >= 10) {
@@ -186,7 +193,7 @@ export class DashboardComponent {
 					},
 				],
 			};
-            
+
 			this.trafficLineChartData.push(data.trafficLineChart);
 			if (this.trafficLineChartData.length > 100) {
 				this.trafficLineChartData.shift();
