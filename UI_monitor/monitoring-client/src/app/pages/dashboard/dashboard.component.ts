@@ -49,6 +49,7 @@ export class DashboardComponent {
 	
 	// ==============
 	flowTemps: any = [];
+    maliciousFlows: any = [];
 
 	constructor(private trackingService: TrackingService) {}
 
@@ -157,15 +158,13 @@ export class DashboardComponent {
 			// console.log('Received message:', data);
 
 			const d = {
-				// src_ip: data.data['Source IP'],
-				dst_ip: data.data['Dest Post'],
-				src_port: data.data['Protocol'],
-				dst_port: data.data['Timestamp'],
-
-				protocol: data.data['Flow Duration'],
-				timestamp: data.data['Flow Bytes/s'],
-				// prediction: data.data.prediction,
-				prediction: data.data['Predict'],
+                timestamp: data.data['Timestamp'],
+				dst_port: data.data['Dest_Post'],
+				protocol: data.data['Protocol'],
+				flowDuration: data.data['Flow_Duration'].toFixed(2),
+				flow_Bytes_s: data.data['Flow_Bytes_s'].toFixed(2),
+				flow_Packets_s: data.data['Flow_Packets_s'].toFixed(2),
+				predict: data.data['Predict'],
 			};
 
 			if (this.flowTemps.length >= 10) {

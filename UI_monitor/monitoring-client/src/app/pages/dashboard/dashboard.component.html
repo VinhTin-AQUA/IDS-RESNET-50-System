@@ -1,94 +1,92 @@
-<div class=" p-4">
+<div class="p-4">
 	<div>
+		<!-- chart -->
+		<div class="flex gap-4 items-center">
+			<div class="traffic-piechart-container">
+				<ngx-echarts
+					[autoResize]="true"
+					echarts
+					[options]="trafficPieChartoptions"
+					[merge]="updateTrafficPieChartOptions"
+					class="traffic-piechart"
+				></ngx-echarts>
+			</div>
 
-        <!-- chart -->
-        <div class="flex gap-4 items-center">
-            <div class="traffic-piechart-container ">
-                <ngx-echarts
-                    [autoResize]="true"
-                    echarts
-                    [options]="trafficPieChartoptions"
-                    [merge]="updateTrafficPieChartOptions"
-                    class="traffic-piechart"
-                ></ngx-echarts>
-            </div>
+			<div class="traffic-linechart-container flex-1">
+				<ngx-echarts
+					[autoResize]="true"
+					echarts
+					[options]="trafficLineChartoptions"
+					[merge]="updateTrafficLineChartOptions"
+					class="traffic-linechart"
+				></ngx-echarts>
+			</div>
+		</div>
 
-            <div class="traffic-linechart-container flex-1">
-                <ngx-echarts
-                    [autoResize]="true"
-                    echarts
-                    [options]="trafficLineChartoptions"
-                    [merge]="updateTrafficLineChartOptions"
-                    class="traffic-linechart"
-                ></ngx-echarts>
-            </div>
-
-        </div>
-
-        <!-- table -->
-		<div class="relative overflow-x-auto rounded-md shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)]">
-			<table
-				class="w-full text-sm text-left rtl:text-right text-gray-500"
+		<!--  -->
+		<div class="grid grid-cols-1 gap-4">
+			<div
+				class="relative overflow-x-auto rounded-md shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)]"
 			>
-				<thead class="text-xs text-gray-700 uppercase bg-gray-50">
-					<tr>
-						<!-- <th scope="col" class="px-6 py-3">src_ip</th> -->
-						<th scope="col" class="px-6 py-3">dst_ip</th>
-						<th scope="col" class="px-6 py-3">src_port</th>
-						<th scope="col" class="px-6 py-3">dst_port</th>
-						<th scope="col" class="px-6 py-3">protocol</th>
-						<th scope="col" class="px-6 py-3">timestamp</th>
-						<th scope="col" class="px-6 py-3">prediction</th>
-						<th></th>
-					</tr>
-				</thead>
-				<tbody>
-					@for (item of flowTemps; track $index) {
-					<tr class="bg-white border-b border-gray-200">
-						<!-- <th
-							scope="row"
-							class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
-						>
-							{{ item.src_ip }}
-						</th> -->
-						<td class="px-6 py-4">
-							{{ item.dst_ip }}
-						</td>
-						<td class="px-6 py-4">
-							{{ item.src_port }}
-						</td>
-						<td class="px-6 py-4">
-							{{ item.dst_port }}
-						</td>
-						<td class="px-6 py-4">
-							{{ item.protocol }}
-						</td>
-						<td class="px-6 py-4">
-							{{ item.timestamp }}
-						</td>
-						<td class="px-6 py-4">{{ item.prediction }}</td>
-						<td>
-							<button>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke-width="1.5"
-									stroke="currentColor"
-									class="size-6"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-									/>
-								</svg>
-							</button>
-						</td>
-					</tr>
-					}
-				</tbody>
-			</table>
+				<table class="w-full text-sm text-left rtl:text-right text-gray-500">
+					<thead class="text-xs text-gray-700 uppercase bg-gray-50">
+						<tr>
+							<th scope="col" class="px-6 py-3">Timestamp</th>
+							<th scope="col" class="px-6 py-3">Dest Post</th>
+							<th scope="col" class="px-6 py-3">Protocol</th>
+							<th scope="col" class="px-6 py-3">Flow Duration</th>
+							<th scope="col" class="px-6 py-3">Flow Bytes s</th>
+							<th scope="col" class="px-6 py-3">Flow Packets s</th>
+							<th scope="col" class="px-6 py-3">Predict</th>
+							<th scope="col" class="px-6 py-3"></th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						@for (item of flowTemps; track $index) { @if(item.predict !== 'BENIGN') {
+						<tr class="bg-red-200 text-red-900 border-b border-gray-200">
+							<td class="px-6 py-4">
+								{{ item.timestamp }}
+							</td>
+							<td class="px-6 py-4">
+								{{ item.dst_port }}
+							</td>
+							<td class="px-6 py-4">
+								{{ item.protocol }}
+							</td>
+							<td class="px-6 py-4">
+								{{ item.flowDuration }}
+							</td>
+							<td class="px-6 py-4">
+								{{ item.flow_Bytes_s }}
+							</td>
+							<td class="px-6 py-4">{{ item.flow_Packets_s }}</td>
+							<td class="px-6 py-4">{{ item.predict }}</td>
+						</tr>
+						} @else {
+						<tr class="bg-green-200 text-green-900 border-b border-gray-200">
+							<td class="px-6 py-4">
+								{{ item.timestamp }}
+							</td>
+							<td class="px-6 py-4">
+								{{ item.dst_port }}
+							</td>
+							<td class="px-6 py-4">
+								{{ item.protocol }}
+							</td>
+							<td class="px-6 py-4">
+								{{ item.flowDuration }}
+							</td>
+							<td class="px-6 py-4">
+								{{ item.flow_Bytes_s }}
+							</td>
+							<td class="px-6 py-4">{{ item.flow_Packets_s }}</td>
+							<td class="px-6 py-4">{{ item.predict }}</td>
+						</tr>
+						} }
+					</tbody>
+				</table>
+			</div>
 		</div>
 	</div>
 </div>
