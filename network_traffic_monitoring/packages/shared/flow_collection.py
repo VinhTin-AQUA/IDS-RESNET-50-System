@@ -57,15 +57,15 @@ class FlowCollection:
                     "data": message_dict
                 }
 
-                # response = session.post(self._share_api.api_base + '/tracking/flow-tracking', json=payload, headers=headers, verify=False)
+                response = session.post(self._share_api.api_base + '/tracking/flow-tracking', json=payload, headers=headers, verify=False)
 
-                # if response.status_code == 200 or response.status_code == 201:  # Kiểm tra nếu request thành công
-                #     data = response.json()  # Chuyển đổi dữ liệu JSON thành dict
-                #     print(data)
-                #     # print("gui thanh cong")
-                #     pass
-                # else:
-                #     print(f"Lỗi {response.status_code}")
+                if response.status_code == 200 or response.status_code == 201:  # Kiểm tra nếu request thành công
+                    data = response.json()  # Chuyển đổi dữ liệu JSON thành dict
+                    print(data)
+                    # print("gui thanh cong")
+                    pass
+                else:
+                    print(f"Lỗi {response.status_code}")
 
     # def __str__(self):
     #     return f"Queue({self._queue}) - Size: {self._size}"

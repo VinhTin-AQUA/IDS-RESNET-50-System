@@ -282,11 +282,11 @@ class FlowSession(DefaultSession):
             writer.writerow(data.values())
 
     def handle_flow(self, data):
-        data['Label'] = 'Syn'
+        data['Label'] = 'Unknow'
         data['Predict'] = 'Unknow'
 
         # if data['Dest Post'] == 80:
-        self.save_csv(data)
+        # self.save_csv(data)
         value_json = json.dumps(data).encode('utf-8')
         self.flowCollection.add(value_json)
 
