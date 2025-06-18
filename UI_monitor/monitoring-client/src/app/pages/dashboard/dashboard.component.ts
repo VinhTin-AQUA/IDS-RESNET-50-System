@@ -172,6 +172,7 @@ export class DashboardComponent {
 						: data.data['Predict'] === 'Group1'
 						? 'Reflection Amplification'
 						: data.data['Predict'],
+                confidence_score: data.data['confidence_score'].toFixed(2) * 100,
 			};
 
 			if (this.flowTemps.length >= 10) {
