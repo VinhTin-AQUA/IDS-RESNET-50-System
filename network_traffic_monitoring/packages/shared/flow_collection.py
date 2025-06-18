@@ -45,10 +45,11 @@ class FlowCollection:
                 message_dict = json.loads(msg.decode('utf-8'))
                 df = DataFrame([message_dict])
 
-                predict_label = self._model.predict(df)
-                message_dict['Predict'] = predict_label
+                predict = self._model.predict(df)
+                message_dict['Predict'] = predict['predicted_label']
+                message_dict['confidence_score'] = predict['confidence_score']
 
-                print(f"{i} : {message_dict['Predict']}")
+                print(f"{i} : {message_dict['Predict']} - {message_dict['confidence_score']}")
                 i += 1
                 
                 headers = {"Content-Type": "application/json"}

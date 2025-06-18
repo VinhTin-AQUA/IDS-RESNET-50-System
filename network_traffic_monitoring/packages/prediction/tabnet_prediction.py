@@ -1,6 +1,7 @@
 import joblib  # Để lưu mô hình chuẩn hóa
 import pandas as pd
 from pytorch_tabnet.tab_model import TabNetClassifier
+import numpy as np
 
 class TabnetPrediction:
 
@@ -41,7 +42,19 @@ class TabnetPrediction:
         X_scaled = self.scaler.transform(X)
         X_selected = self.selector.transform(X_scaled)
         
-        # Dự đoán
-        y_pred = self.model.predict(X_selected)
-        return self.labels[int(y_pred[0])]
+        # xac suat du doan cua cac lop
+        y_proba = self.model.predict_proba(X_selected)
+        
+        # nhan du doan
+        y_pred = np.argmax(y_proba, axis=1)
+        predicted_label = self.labels[int(y_pred[0])]
+        
+        # Lấy độ tin cậy (xác suất cao nhất)
+        confidence_score = np.max(y_proba, axis=1)[0]
+        
+        return {
+            "predicted_label": predicted_label,
+            "confidence_score": float(confidence_score),
+            # "class_probabilities": dict(zip(self.labels, y_proba[0].tolist()))
+        }
         
