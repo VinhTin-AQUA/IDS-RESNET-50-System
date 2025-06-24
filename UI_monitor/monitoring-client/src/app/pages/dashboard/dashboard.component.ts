@@ -66,7 +66,7 @@ export class DashboardComponent {
 		// initialize chart options:
 		this.trafficPieChartoptions = {
 			title: {
-				text: 'Biểu đồ lưu lượng trong 1 giây',
+				text: '',
 				left: 'center',
 			},
 			tooltip: {
@@ -106,7 +106,7 @@ export class DashboardComponent {
 	private initReceiveTrafficLineChart() {
 		this.trafficLineChartoptions = {
 			title: {
-				text: 'Lưu lượng mạng theo thời gian thực',
+				text: '',
 				left: 'center',
 			},
 			tooltip: {
@@ -164,8 +164,6 @@ export class DashboardComponent {
 				dst_port: data.data['Dest Post'],
 				protocol: data.data['Protocol'],
 				flowDuration: data.data['Flow Duration'].toFixed(2),
-				flow_Bytes_s: data.data['Flow Bytes/s'].toFixed(2),
-				flow_Packets_s: data.data['Flow Packets/s'].toFixed(2),
 				predict:
 					data.data['Predict'] === 'Group2'
 						? 'UDP'
@@ -173,6 +171,7 @@ export class DashboardComponent {
 						? 'Reflection Amplification'
 						: data.data['Predict'],
                 confidence_score: data.data['confidence_score'].toFixed(2) * 100,
+                catgory: data.data['Predict'] === 'BENIGN' ? 'Benign' : 'Malicious'
 			};
 
 			if (this.flowTemps.length >= 10) {
