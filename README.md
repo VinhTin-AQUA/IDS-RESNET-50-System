@@ -72,7 +72,7 @@ npm install
 npm run start dev
 ```
 
-#### 3️⃣ Python Prediction Script (only in linux)
+#### 3️⃣ Python Prediction Script (only on linux)
 
 ```bash
 source .venv/bin/activate
